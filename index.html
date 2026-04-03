@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Mi Organizador</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Botón menú hamburguesa -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para cerrar menú -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Menú lateral CON BOTONES DESPLEGABLES -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-calendar-alt"></i>
+                <h1>Mi Organizador</h1>
+            </div>
+        </div>
+
+        <!-- ===== MENÚ CON SECCIONES DESPLEGABLES ===== -->
+        <div class="menu-items">
+            <!-- INICIO (siempre visible) -->
+            <button class="menu-btn" data-page="inicio">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </button>
+
+            <!-- SECCIÓN 1: PERSONAL (DESPLEGABLE) -->
+            <div class="menu-section">
+                <button class="menu-btn dropdown-btn" data-dropdown="personal">
+                    <i class="fas fa-user"></i>
+                    <span>Personal</span>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdown-personal">
+                    <button class="menu-btn dropdown-item" data-page="cuidado-personal">
+                        <i class="fas fa-heart"></i>
+                        <span>Cuidado Personal</span>
+                    </button>
+                    <button class="menu-btn dropdown-item" data-page="comidas">
+                        <i class="fas fa-apple-alt"></i>
+                        <span>Comidas Saludables</span>
+                    </button>
+                    <button class="menu-btn dropdown-item" data-page="economia">
+                        <i class="fas fa-coins"></i>
+                        <span>Economía</span>
+                    </button>
+                    <!-- NUEVO: Bloc de Notas -->
+                    <button class="menu-btn dropdown-item" data-page="notas">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>📝 Bloc de Notas</span>
+                    </button>
+                    <!-- NUEVO: Mi Diario -->
+                    <button class="menu-btn dropdown-item" data-page="diario">
+                        <i class="fas fa-book-open"></i>
+                        <span>📔 Mi Diario</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: DESARROLLO (DESPLEGABLE) -->
+            <div class="menu-section">
+                <button class="menu-btn dropdown-btn" data-dropdown="desarrollo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Desarrollo</span>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdown-desarrollo">
+                    <button class="menu-btn dropdown-item" data-page="estudio">
+                        <i class="fas fa-book"></i>
+                        <span>Estudio</span>
+                    </button>
+                    <button class="menu-btn dropdown-item" data-page="trabajo">
+                        <i class="fas fa-bullseye"></i>
+                        <span>Trabajo</span>
+                    </button>
+                    <button class="menu-btn dropdown-item" data-page="metas">
+                        <i class="fas fa-brain"></i>
+                        <span>Metas</span>
+                    </button>
+                    <button class="menu-btn dropdown-item" data-page="recomendaciones">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Recomendaciones</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: RELACIONES (DESPLEGABLE) -->
+            <div class="menu-section">
+                <button class="menu-btn dropdown-btn" data-dropdown="relaciones">
+                    <i class="fas fa-users"></i>
+                    <span>Relaciones</span>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdown-relaciones">
+                    <button class="menu-btn dropdown-item" data-page="familia">
+                        <i class="fas fa-users"></i>
+                        <span>Familia y Mascota</span>
+                    </button>
+                    <button class="menu-btn dropdown-item" data-page="pareja">
+                        <i class="fas fa-heart"></i>
+                        <span>Pareja</span>
+                    </button>
+                    <button class="menu-btn dropdown-item" data-page="amistad">
+                        <i class="fas fa-user-friends"></i>
+                        <span>Amigos</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 4: ESPIRITUAL (DESPLEGABLE) -->
+            <div class="menu-section">
+                <button class="menu-btn dropdown-btn" data-dropdown="espiritual">
+                    <i class="fas fa-star"></i>
+                    <span>Espiritual</span>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdown-espiritual">
+                    <button class="menu-btn dropdown-item" data-page="iglesia">
+                        <i class="fas fa-church"></i>
+                        <span>Iglesia</span>
+                    </button>
+                    <button class="menu-btn dropdown-item" data-page="shana">
+                        <i class="fas fa-heart" style="color: #ff6b6b;"></i>
+                        <span>❤️ SHANA ❤️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CALENDARIO (siempre visible) -->
+            <button class="menu-btn" data-page="calendario">
+                <i class="fas fa-calendar-day"></i>
+                <span>Calendario</span>
+            </button>
+        </div>
+
+        <!-- Footer del sidebar -->
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="username">Shana</span>
+                    <span class="user-status">En línea</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="btn-logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <div class="mobile-back-btn" id="mobileBackBtn">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <div class="breadcrumb" id="pageTitle">
+                    Inicio
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="notifications-btn" id="notificationsBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Iframe -->
+        <iframe 
+            id="contentFrame" 
+            src="contenido-inicio.html" 
+            frameborder="0"
+            title="Contenido principal"
+            style="width: 100%; height: calc(100vh - 80px); border: none;">
+        </iframe>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

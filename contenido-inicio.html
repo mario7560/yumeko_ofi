@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Organizador Shana ✨</title>
+    <style>
+        /* ===== ESTILO SHANA CON FLORES Y ANIMACIONES ===== */
+        :root {
+            --shana-purple: #8B5F8C;
+            --shana-pink: #F4A7B9;
+            --shana-lavender: #D9B8E0;
+            --shana-cream: #FFF9F0;
+            --shana-rose: #FFC0D0;
+            --shana-mint: #B8E0D4;
+            --shana-gold: #FFE5B4;
+            --shana-white: #FFFFFF;
+            --shana-shadow: rgba(139, 95, 140, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: linear-gradient(145deg, #FFE9F3 0%, #FFF3E6 100%);
+            color: var(--shana-purple);
+            padding: 15px;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== FLORES ANIMADAS DE FONDO ===== */
+        .flower-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .flower {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.2;
+            animation: floatFlower 15s infinite linear;
+            color: var(--shana-pink);
+            text-shadow: 0 0 10px rgba(244, 167, 185, 0.3);
+        }
+
+        .flower:nth-child(1) { top: 10%; left: 5%; animation-duration: 18s; color: #FFB6C1; }
+        .flower:nth-child(2) { top: 70%; right: 3%; animation-duration: 22s; color: #DDA0DD; }
+        .flower:nth-child(3) { bottom: 15%; left: 15%; animation-duration: 25s; color: #FFDAB9; }
+        .flower:nth-child(4) { top: 40%; right: 20%; animation-duration: 20s; color: #E6E6FA; }
+        .flower:nth-child(5) { bottom: 30%; right: 35%; animation-duration: 28s; color: #FFC0CB; }
+        .flower:nth-child(6) { top: 85%; left: 40%; animation-duration: 16s; color: #FADADD; }
+        .flower:nth-child(7) { top: 20%; right: 60%; animation-duration: 24s; color: #FFE4E1; }
+        .flower:nth-child(8) { bottom: 50%; left: 80%; animation-duration: 19s; color: #FFB7C5; }
+        .flower:nth-child(9) { top: 60%; left: 25%; animation-duration: 21s; color: #F8B8D0; }
+        .flower:nth-child(10) { bottom: 10%; right: 70%; animation-duration: 23s; color: #E0BBE4; }
+        .flower:nth-child(11) { top: 15%; left: 70%; animation-duration: 26s; color: #FBC8D5; }
+        .flower:nth-child(12) { bottom: 65%; right: 45%; animation-duration: 17s; color: #D4A5C9; }
+
+        @keyframes floatFlower {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(5deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(15px) rotate(-5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        .welcome-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ===== TARJETA PRINCIPAL ===== */
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px var(--shana-shadow), 0 0 0 2px rgba(255, 255, 255, 0.5) inset;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,240,0.3) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            color: var(--shana-pink);
+            margin-bottom: 15px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .welcome-card h2 {
+            color: var(--shana-purple);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .welcome-text {
+            color: #7A6A7A;
+            font-size: 1rem;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+
+        /* ===== STATS ===== */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            padding: 15px 10px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            box-shadow: 0 5px 15px var(--shana-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--shana-pink);
+            background: rgba(244, 167, 185, 0.15);
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .stat-info h3 {
+            color: var(--shana-purple);
+            font-size: 1.3rem;
+            margin-bottom: 3px;
+        }
+
+        .stat-info p {
+            color: #8F7A8F;
+            font-size: 0.8rem;
+        }
+
+        /* ===== BOTONES ===== */
+        .welcome-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #F4A7B9 0%, #D9B8E0 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(244, 167, 185, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            flex: 1;
+            justify-content: center;
+            min-width: 140px;
+        }
+
+        .action-btn.outline {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--shana-pink);
+            border: 2px solid var(--shana-pink);
+            box-shadow: none;
+        }
+
+        /* ===== GALERÍA DESPLEGABLE ===== */
+        .gallery-section {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            overflow: hidden;
+        }
+
+        .gallery-header {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .gallery-header:hover {
+            background: rgba(244, 167, 185, 0.1);
+        }
+
+        .gallery-header h3 {
+            color: var(--shana-purple);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gallery-header h3 i {
+            color: var(--shana-pink);
+        }
+
+        .gallery-toggle {
+            font-size: 1.2rem;
+            color: var(--shana-pink);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-content {
+            max-height: 0;
+            padding: 0 20px;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .gallery-section.expanded .gallery-content {
+            max-height: 400px;
+            padding: 0 20px 20px 20px;
+            overflow-y: auto;
+        }
+
+        .gallery-section.expanded .gallery-toggle {
+            transform: rotate(180deg);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            box-shadow: 0 3px 8px rgba(139, 95, 140, 0.2);
+        }
+
+        .gallery-item:hover {
+            transform: scale(0.98);
+        }
+
+        .gallery-item.selected {
+            border-color: var(--shana-pink);
+            box-shadow: 0 0 0 3px rgba(244, 167, 185, 0.4);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-upload {
+            background: linear-gradient(135deg, #F4A7B9 20%, #D9B8E0 80%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            width: 100%;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        /* ===== SECCIÓN DE TAREAS Y EVENTOS ===== */
+        .sections-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-header h3 {
+            color: var(--shana-purple);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-header h3 i {
+            color: var(--shana-pink);
+        }
+
+        .small-btn {
+            background: linear-gradient(135deg, #F4A7B9 0%, #D9B8E0 100%);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .small-btn.outline {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--shana-pink);
+            border: 2px solid var(--shana-pink);
+        }
+
+        /* ===== LISTA DE TAREAS ===== */
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            border: 1px solid rgba(244, 167, 185, 0.2);
+            gap: 10px;
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+            background: rgba(220, 220, 220, 0.3);
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .task-check input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--shana-pink);
+            cursor: pointer;
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: var(--shana-purple);
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+
+        .task-date {
+            font-size: 0.75rem;
+            color: #8F7A8F;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .task-btn {
+            background: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--shana-pink);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .task-btn:hover {
+            background: rgba(244, 167, 185, 0.2);
+        }
+
+        .task-btn.delete:hover {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        /* ===== LISTA DE EVENTOS ===== */
+        .event-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            border: 1px solid rgba(217, 184, 224, 0.3);
+            gap: 10px;
+            border-left: 4px solid var(--shana-pink);
+        }
+
+        .event-icon {
+            width: 35px;
+            height: 35px;
+            background: rgba(244, 167, 185, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--shana-pink);
+            font-size: 1.1rem;
+        }
+
+        .event-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .event-title {
+            font-weight: 600;
+            color: var(--shana-purple);
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+
+        .event-date {
+            font-size: 0.75rem;
+            color: #8F7A8F;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .event-description {
+            font-size: 0.8rem;
+            color: #7A6A7A;
+            margin-top: 3px;
+            word-break: break-word;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .event-btn {
+            background: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--shana-pink);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .event-btn:hover {
+            background: rgba(244, 167, 185, 0.2);
+        }
+
+        .event-btn.delete:hover {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #8F7A8F;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--shana-pink);
+            opacity: 0.5;
+        }
+
+        /* ===== MODALES ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 15px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 450px;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(139, 95, 140, 0.3);
+            transform: scale(0.9);
+            transition: all 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: var(--shana-purple);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--shana-pink);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: rgba(244, 167, 185, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--shana-purple);
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(244, 167, 185, 0.2);
+            border-radius: 20px;
+            font-size: 0.95rem;
+            background: white;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--shana-pink);
+            box-shadow: 0 0 0 3px rgba(244, 167, 185, 0.2);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            min-width: 120px;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #F4A7B9 0%, #D9B8E0 100%);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: rgba(244, 167, 185, 0.1);
+            color: var(--shana-pink);
+            border: 2px solid var(--shana-pink);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 167, 185, 0.3);
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--shana-pink);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            
+            .quick-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .stat-card {
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 12px 15px;
+            }
+            
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .stat-info h3 { font-size: 1.2rem; }
+            .stat-info p { font-size: 0.85rem; }
+            
+            .welcome-actions {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-item, .event-item {
+                flex-wrap: wrap;
+            }
+            
+            .task-actions, .event-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .modal-container {
+                padding: 20px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .quick-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .gallery-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Scroll personalizado */
+        .gallery-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .gallery-content::-webkit-scrollbar-track {
+            background: rgba(244, 167, 185, 0.1);
+            border-radius: 10px;
+        }
+
+        .gallery-content::-webkit-scrollbar-thumb {
+            background: var(--shana-pink);
+            border-radius: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- FLORES ANIMADAS DE FONDO -->
+    <div class="flower-bg">
+        <div class="flower">🌸</div>
+        <div class="flower">🌼</div>
+        <div class="flower">🌺</div>
+        <div class="flower">🌸</div>
+        <div class="flower">🌷</div>
+        <div class="flower">🌻</div>
+        <div class="flower">🌼</div>
+        <div class="flower">🌸</div>
+        <div class="flower">🌺</div>
+        <div class="flower">🌷</div>
+        <div class="flower">🌻</div>
+        <div class="flower">🌼</div>
+    </div>
+
+    <div class="welcome-content">
+        <!-- TARJETA PRINCIPAL -->
+        <div class="welcome-card">
+            <div class="welcome-icon">
+                <i class="fas fa-heart"></i>
+            </div>
+            <h2>¡Bienvenida, mi niña! 💕</h2>
+            <p class="welcome-text">
+                Organiza tu tiempo de manera dulce y efectiva
+            </p>
+
+            <div class="quick-stats" id="quickStats">
+                <!-- Los stats se actualizan dinámicamente -->
+            </div>
+
+            <div class="welcome-actions">
+                <button class="action-btn" id="newEventBtn">
+                    <i class="fas fa-calendar-plus"></i> Nuevo Evento
+                </button>
+                <button class="action-btn outline" id="newTaskBtn">
+                    <i class="fas fa-tasks"></i> Nueva Tarea
+                </button>
+            </div>
+        </div>
+
+        <!-- GALERÍA DESPLEGABLE -->
+        <div class="gallery-section" id="gallerySection">
+            <div class="gallery-header" id="galleryHeader">
+                <h3>
+                    <i class="fas fa-images"></i> 
+                    Galería de Fondos
+                    <span style="font-size: 0.8rem; margin-left: 5px; color: #8F7A8F;" id="selectedCount"></span>
+                </h3>
+                <i class="fas fa-chevron-down gallery-toggle"></i>
+            </div>
+            <div class="gallery-content">
+                <div class="gallery-grid" id="galleryGrid">
+                    <!-- Las imágenes se cargan aquí -->
+                </div>
+                <button class="gallery-upload" id="uploadImageBtn">
+                    <i class="fas fa-cloud-upload-alt"></i> Subir imagen
+                </button>
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            </div>
+        </div>
+
+        <!-- CONTENEDOR DE TAREAS Y EVENTOS -->
+        <div class="sections-container">
+            <!-- SECCIÓN DE TAREAS -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-tasks"></i> 
+                        Mis Tareas
+                        <span style="font-size: 0.8rem; color: #8F7A8F;" id="taskCount"></span>
+                    </h3>
+                    <button class="small-btn outline" id="addTaskBtn">
+                        <i class="fas fa-plus"></i> Nueva Tarea
+                    </button>
+                </div>
+                <div id="tasksList">
+                    <!-- Las tareas se cargan dinámicamente -->
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE EVENTOS -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-calendar-alt"></i> 
+                        Mis Eventos
+                        <span style="font-size: 0.8rem; color: #8F7A8F;" id="eventCount"></span>
+                    </h3>
+                    <button class="small-btn outline" id="addEventBtn">
+                        <i class="fas fa-plus"></i> Nuevo Evento
+                    </button>
+                </div>
+                <div id="eventsList">
+                    <!-- Los eventos se cargan dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA EVENTOS -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-alt"></i> Nuevo Evento</h3>
+                <button class="close-modal" id="closeEventModal">&times;</button>
+            </div>
+            <form id="eventForm" class="modal-form">
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="eventTitle" placeholder="Ej: Cita médica" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="eventDesc" rows="2" placeholder="Descripción..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-day"></i> Fecha y hora</label>
+                    <input type="datetime-local" id="eventDateTime" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button type="button" class="modal-btn secondary" id="cancelEventBtn">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PARA TAREAS -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-tasks"></i> Nueva Tarea</h3>
+                <button class="close-modal" id="closeTaskModal">&times;</button>
+            </div>
+            <form id="taskForm" class="modal-form">
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="taskTitle" placeholder="Ej: Estudiar" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="taskDesc" rows="2" placeholder="Descripción..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-day"></i> Fecha límite</label>
+                    <input type="datetime-local" id="taskDateTime" required>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="taskCompleted">
+                    <label for="taskCompleted">Marcar como completada</label>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button type="button" class="modal-btn secondary" id="cancelTaskBtn">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PARA EDITAR TAREA -->
+    <div class="modal-overlay" id="editTaskModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Editar Tarea</h3>
+                <button class="close-modal" id="closeEditModal">&times;</button>
+            </div>
+            <form id="editTaskForm" class="modal-form">
+                <input type="hidden" id="editTaskId">
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="editTaskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="editTaskDesc" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-day"></i> Fecha límite</label>
+                    <input type="datetime-local" id="editTaskDateTime" required>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="editTaskCompleted">
+                    <label for="editTaskCompleted">Completada</label>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn primary">
+                        <i class="fas fa-save"></i> Actualizar
+                    </button>
+                    <button type="button" class="modal-btn secondary" id="cancelEditBtn">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PARA EDITAR EVENTO -->
+    <div class="modal-overlay" id="editEventModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Editar Evento</h3>
+                <button class="close-modal" id="closeEditEventModal">&times;</button>
+            </div>
+            <form id="editEventForm" class="modal-form">
+                <input type="hidden" id="editEventId">
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="editEventTitle" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="editEventDesc" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-day"></i> Fecha y hora</label>
+                    <input type="datetime-local" id="editEventDateTime" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn primary">
+                        <i class="fas fa-save"></i> Actualizar
+                    </button>
+                    <button type="button" class="modal-btn secondary" id="cancelEditEventBtn">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ===== SISTEMA DE ALMACENAMIENTO LOCAL =====
+        let tasks = JSON.parse(localStorage.getItem('shana_tasks')) || [];
+        let events = JSON.parse(localStorage.getItem('shana_events')) || [];
+        let selectedBackground = localStorage.getItem('shana_background') || '';
+        let galleryImages = JSON.parse(localStorage.getItem('shana_gallery')) || [];
+
+        // ===== FUNCIONES PARA ESTADÍSTICAS =====
+        function updateStats() {
+            const today = new Date().toDateString();
+            const eventsToday = events.filter(e => new Date(e.dateTime).toDateString() === today).length;
+            
+            const completedTasks = tasks.filter(t => t.completed).length;
+            const totalTasks = tasks.length;
+
+            const statsHTML = `
+                <div class="stat-card">
+                    <i class="fas fa-calendar-check stat-icon"></i>
+                    <div class="stat-info">
+                        <h3>${eventsToday}</h3>
+                        <p>Eventos hoy</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-tasks stat-icon"></i>
+                    <div class="stat-info">
+                        <h3>${totalTasks}</h3>
+                        <p>Tareas totales</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle stat-icon"></i>
+                    <div class="stat-info">
+                        <h3>${completedTasks}/${totalTasks}</h3>
+                        <p>Completadas</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('quickStats').innerHTML = statsHTML;
+            
+            // Actualizar contadores
+            document.getElementById('taskCount').textContent = `(${tasks.length})`;
+            document.getElementById('eventCount').textContent = `(${events.length})`;
+        }
+
+        // ===== FUNCIONES PARA TAREAS =====
+        function renderTasks() {
+            const tasksList = document.getElementById('tasksList');
+            
+            if (tasks.length === 0) {
+                tasksList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No hay tareas aún</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Ordenar por fecha (más próximas primero)
+            const sortedTasks = [...tasks].sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+            tasksList.innerHTML = sortedTasks.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                    <div class="task-check">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskComplete('${task.id}')">
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-date">
+                            <i class="far fa-calendar-alt"></i> 
+                            ${new Date(task.dateTime).toLocaleString()}
+                        </div>
+                        ${task.description ? `<div style="font-size: 0.8rem; color: #7A6A7A; margin-top: 3px;">${task.description}</div>` : ''}
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-btn" onclick="editTask('${task.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="task-btn delete" onclick="deleteTask('${task.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.toggleTaskComplete = function(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+                updateStats();
+            }
+        };
+
+        window.deleteTask = function(taskId) {
+            if (confirm('¿Eliminar esta tarea? 💕')) {
+                tasks = tasks.filter(t => t.id !== taskId);
+                saveTasks();
+                renderTasks();
+                updateStats();
+            }
+        };
+
+        window.editTask = function(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                document.getElementById('editTaskId').value = task.id;
+                document.getElementById('editTaskTitle').value = task.title;
+                document.getElementById('editTaskDesc').value = task.description || '';
+                
+                const date = new Date(task.dateTime);
+                const formattedDate = date.toISOString().slice(0, 16);
+                document.getElementById('editTaskDateTime').value = formattedDate;
+                
+                document.getElementById('editTaskCompleted').checked = task.completed || false;
+                
+                document.getElementById('editTaskModal').classList.add('active');
+            }
+        };
+
+        function saveTasks() {
+            localStorage.setItem('shana_tasks', JSON.stringify(tasks));
+        }
+
+        // ===== FUNCIONES PARA EVENTOS =====
+        function renderEvents() {
+            const eventsList = document.getElementById('eventsList');
+            
+            if (events.length === 0) {
+                eventsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>No hay eventos programados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Ordenar por fecha (más próximos primero)
+            const sortedEvents = [...events].sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+            eventsList.innerHTML = sortedEvents.map(event => `
+                <div class="event-item" data-id="${event.id}">
+                    <div class="event-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-title">${event.title}</div>
+                        <div class="event-date">
+                            <i class="far fa-clock"></i> 
+                            ${new Date(event.dateTime).toLocaleString()}
+                        </div>
+                        ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+                    </div>
+                    <div class="event-actions">
+                        <button class="event-btn" onclick="editEvent('${event.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="event-btn delete" onclick="deleteEvent('${event.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.deleteEvent = function(eventId) {
+            if (confirm('¿Eliminar este evento? 💕')) {
+                events = events.filter(e => e.id !== eventId);
+                localStorage.setItem('shana_events', JSON.stringify(events));
+                renderEvents();
+                updateStats();
+            }
+        };
+
+        window.editEvent = function(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (event) {
+                document.getElementById('editEventId').value = event.id;
+                document.getElementById('editEventTitle').value = event.title;
+                document.getElementById('editEventDesc').value = event.description || '';
+                
+                const date = new Date(event.dateTime);
+                const formattedDate = date.toISOString().slice(0, 16);
+                document.getElementById('editEventDateTime').value = formattedDate;
+                
+                document.getElementById('editEventModal').classList.add('active');
+            }
+        };
+
+        function saveEvent(event) {
+            event.id = Date.now().toString();
+            events.push(event);
+            localStorage.setItem('shana_events', JSON.stringify(events));
+            renderEvents();
+            updateStats();
+        }
+
+        // ===== FUNCIONES PARA GALERÍA =====
+        function renderGallery() {
+            const galleryGrid = document.getElementById('galleryGrid');
+            
+            const defaultImages = [
+                'https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=200',
+                'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=200',
+                'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=200',
+                'https://images.unsplash.com/photo-1468327768560-75b778cbb551?w=200',
+            ];
+
+            const allImages = [...galleryImages, ...defaultImages].slice(0, 12);
+
+            galleryGrid.innerHTML = allImages.map((img, index) => `
+                <div class="gallery-item ${selectedBackground === img ? 'selected' : ''}" onclick="selectBackground('${img}', ${index})">
+                    <img src="${typeof img === 'string' ? img : URL.createObjectURL(img)}" alt="Fondo" loading="lazy">
+                </div>
+            `).join('');
+
+            document.getElementById('selectedCount').textContent = selectedBackground ? '✓ Fondo seleccionado' : '';
+        }
+
+        window.selectBackground = function(imageUrl, index) {
+            selectedBackground = imageUrl;
+            localStorage.setItem('shana_background', imageUrl);
+            
+            document.body.style.backgroundImage = `url('${imageUrl}')`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.backgroundPosition = 'center';
+            
+            document.querySelector('.flower-bg').style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+            
+            renderGallery();
+        };
+
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTasks();
+            renderEvents();
+            updateStats();
+            renderGallery();
+
+            // Aplicar fondo guardado
+            if (selectedBackground) {
+                document.body.style.backgroundImage = `url('${selectedBackground}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.querySelector('.flower-bg').style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+            }
+
+            // ===== GALERÍA DESPLEGABLE =====
+            const gallerySection = document.getElementById('gallerySection');
+            const galleryHeader = document.getElementById('galleryHeader');
+            
+            galleryHeader.addEventListener('click', () => {
+                gallerySection.classList.toggle('expanded');
+            });
+
+            // ===== MODALES =====
+            // Abrir modales
+            document.getElementById('newEventBtn').addEventListener('click', () => {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('eventDateTime').value = now.toISOString().slice(0, 16);
+                document.getElementById('eventModal').classList.add('active');
+            });
+
+            document.getElementById('addEventBtn').addEventListener('click', () => {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('eventDateTime').value = now.toISOString().slice(0, 16);
+                document.getElementById('eventModal').classList.add('active');
+            });
+
+            document.getElementById('newTaskBtn').addEventListener('click', () => {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('taskDateTime').value = now.toISOString().slice(0, 16);
+                document.getElementById('taskModal').classList.add('active');
+            });
+
+            document.getElementById('addTaskBtn').addEventListener('click', () => {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('taskDateTime').value = now.toISOString().slice(0, 16);
+                document.getElementById('taskModal').classList.add('active');
+            });
+
+            // Cerrar modales
+            const closeButtons = [
+                'closeEventModal', 'cancelEventBtn',
+                'closeTaskModal', 'cancelTaskBtn',
+                'closeEditModal', 'cancelEditBtn',
+                'closeEditEventModal', 'cancelEditEventBtn'
+            ];
+
+            closeButtons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+                    });
+                }
+            });
+
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+
+            // Formulario de evento
+            document.getElementById('eventForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const event = {
+                    title: document.getElementById('eventTitle').value,
+                    description: document.getElementById('eventDesc').value,
+                    dateTime: document.getElementById('eventDateTime').value
+                };
+                
+                saveEvent(event);
+                document.getElementById('eventModal').classList.remove('active');
+                e.target.reset();
+                alert('✨ ¡Evento guardado!');
+            });
+
+            // Formulario de tarea
+            document.getElementById('taskForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const task = {
+                    id: Date.now().toString(),
+                    title: document.getElementById('taskTitle').value,
+                    description: document.getElementById('taskDesc').value,
+                    dateTime: document.getElementById('taskDateTime').value,
+                    completed: document.getElementById('taskCompleted').checked
+                };
+                
+                tasks.push(task);
+                saveTasks();
+                renderTasks();
+                updateStats();
+                
+                document.getElementById('taskModal').classList.remove('active');
+                e.target.reset();
+                alert('📋 ¡Tarea guardada!');
+            });
+
+            // Formulario de edición de tarea
+            document.getElementById('editTaskForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const taskId = document.getElementById('editTaskId').value;
+                const task = tasks.find(t => t.id === taskId);
+                
+                if (task) {
+                    task.title = document.getElementById('editTaskTitle').value;
+                    task.description = document.getElementById('editTaskDesc').value;
+                    task.dateTime = document.getElementById('editTaskDateTime').value;
+                    task.completed = document.getElementById('editTaskCompleted').checked;
+                    
+                    saveTasks();
+                    renderTasks();
+                    updateStats();
+                    
+                    document.getElementById('editTaskModal').classList.remove('active');
+                    alert('✏️ ¡Tarea actualizada!');
+                }
+            });
+
+            // Formulario de edición de evento
+            document.getElementById('editEventForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const eventId = document.getElementById('editEventId').value;
+                const event = events.find(e => e.id === eventId);
+                
+                if (event) {
+                    event.title = document.getElementById('editEventTitle').value;
+                    event.description = document.getElementById('editEventDesc').value;
+                    event.dateTime = document.getElementById('editEventDateTime').value;
+                    
+                    localStorage.setItem('shana_events', JSON.stringify(events));
+                    renderEvents();
+                    updateStats();
+                    
+                    document.getElementById('editEventModal').classList.remove('active');
+                    alert('✏️ ¡Evento actualizado!');
+                }
+            });
+
+            // Subir imagen
+            document.getElementById('uploadImageBtn').addEventListener('click', () => {
+                document.getElementById('imageUpload').click();
+            });
+
+            document.getElementById('imageUpload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        galleryImages.push(event.target.result);
+                        localStorage.setItem('shana_gallery', JSON.stringify(galleryImages));
+                        renderGallery();
+                        
+                        // Auto expandir la galería
+                        document.getElementById('gallerySection').classList.add('expanded');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

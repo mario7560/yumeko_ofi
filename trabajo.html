@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Trabajo y Proyectos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== VARIABLES DE COLORES (NUEVA PALETA) ===== */
+        :root {
+            --nostalgia: #67546B;
+            --amaranth: #C65E75;
+            --woodlands: #2A342E;
+            
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F9F9FB;
+            --bg-light: #FFF9FB;
+            
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-light: #FFFFFF;
+            
+            --shadow: rgba(103, 84, 107, 0.15);
+            --shadow-dark: rgba(103, 84, 107, 0.3);
+            
+            --excelente: #4CAF50;
+            --bueno: #8BC34A;
+            --regular: #FFC107;
+            --deficiente: #FF9800;
+            --critico: #F44336;
+        }
+
+        /* ===== ESTILOS GENERALES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F8F9FF 0%, var(--nostalgia) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.4s ease;
+        }
+
+        /* ===== MODO CUADRITOS COMPACTOS ===== */
+        .modo-cuadritos {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-header {
+            background: linear-gradient(135deg, var(--nostalgia) 0%, var(--amaranth) 100%);
+            color: var(--text-light);
+            padding: 30px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px var(--shadow-dark);
+            position: relative;
+        }
+
+        .main-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+
+        .main-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .btn-crear-trabajo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-crear-trabajo:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .btn-eliminar-trabajo {
+            background: rgba(244, 67, 54, 0.1);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #F44336;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-eliminar-trabajo:hover {
+            background: #F44336;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .cuadritos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Cuadrito Compacto de Trabajo */
+        .cuadrito-trabajo {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            box-shadow: 0 8px 20px var(--shadow);
+            overflow: hidden;
+            border: 2px solid rgba(103, 84, 107, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .cuadrito-trabajo:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 35px var(--shadow-dark);
+        }
+
+        .cuadrito-header {
+            padding: 25px;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cuadrito-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.1;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+
+        .cuadrito-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .cuadrito-titulo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cuadrito-empresa {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+
+        .cuadrito-estadisticas {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+
+        .cuadrito-estadistica {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            min-width: 70px;
+        }
+
+        .cuadrito-estadistica .valor {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .cuadrito-estadistica .etiqueta {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+
+        .cuadrito-expandir {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-expandir, .btn-editar-trabajo {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-expandir:hover, .btn-editar-trabajo:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .btn-editar-trabajo {
+            background: rgba(103, 84, 107, 0.2);
+        }
+
+        /* ===== MODO EXPANDIDO ===== */
+        .modo-expandido {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 1000;
+            overflow-y: auto;
+            display: none;
+            animation: expandir 0.5s ease-out;
+        }
+
+        .modo-expandido.active {
+            display: block;
+        }
+
+        @keyframes expandir {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .trabajo-expandido-header {
+            background: linear-gradient(135deg, var(--amaranth) 0%, var(--nostalgia) 100%);
+            color: var(--text-light);
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .trabajo-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .trabajo-logo-expandido {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .trabajo-titulo-expandido h2 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .trabajo-titulo-expandido p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .btn-cerrar {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.3rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-cerrar:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .trabajo-expandido-estadisticas {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 25px;
+            background: var(--bg-secondary);
+            flex-wrap: wrap;
+        }
+
+        .estadistica-expandida {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .estadistica-valor {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .estadistica-etiqueta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== CONTENIDO EXPANDIDO ===== */
+        .trabajo-contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* NAVEGACIÓN DE SECCIONES */
+        .trabajo-nav {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .trabajo-nav-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid var(--nostalgia);
+            color: var(--nostalgia);
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trabajo-nav-btn:hover {
+            background: rgba(103, 84, 107, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .trabajo-nav-btn.active {
+            background: var(--nostalgia);
+            color: var(--text-light);
+            box-shadow: 0 5px 15px rgba(103, 84, 107, 0.3);
+        }
+
+        /* SECCIONES */
+        .trabajo-seccion {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .trabajo-seccion.active {
+            display: block;
+        }
+
+        /* TARJETAS DE INFORMACIÓN */
+        .info-card {
+            background: var(--bg-primary);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px var(--shadow);
+            border: 1px solid rgba(103, 84, 107, 0.2);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--shadow-dark);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(103, 84, 107, 0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-add {
+            background: var(--amaranth);
+            color: var(--text-light);
+        }
+
+        .btn-edit {
+            background: var(--nostalgia);
+            color: var(--text-light);
+        }
+
+        .btn-delete {
+            background: var(--woodlands);
+            color: var(--text-light);
+        }
+
+        .btn-done {
+            background: var(--excelente);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* PROYECTOS */
+        .proyectos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .proyecto-card {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .proyecto-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        .proyecto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .proyecto-nombre {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .proyecto-cliente {
+            background: rgba(103, 84, 107, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--nostalgia);
+        }
+
+        .proyecto-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .info-item i {
+            width: 20px;
+            color: var(--nostalgia);
+        }
+
+        .estado-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .estado-pendiente { background: rgba(255, 193, 7, 0.1); color: var(--regular); }
+        .estado-progreso { background: rgba(33, 150, 243, 0.1); color: #2196F3; }
+        .estado-revision { background: rgba(156, 39, 176, 0.1); color: #9C27B0; }
+        .estado-completado { background: rgba(76, 175, 80, 0.1); color: var(--excelente); }
+
+        .progreso-container {
+            margin: 15px 0;
+        }
+
+        .progreso-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .progreso-bar {
+            height: 8px;
+            background: rgba(103, 84, 107, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progreso-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* TAREAS DIARIAS */
+        .tareas-diarias {
+            margin-top: 20px;
+            border-top: 1px dashed rgba(103, 84, 107, 0.3);
+            padding-top: 15px;
+        }
+
+        .tarea-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(198, 94, 117, 0.05);
+            border-radius: 8px;
+        }
+
+        .tarea-item.completada {
+            opacity: 0.7;
+            text-decoration: line-through;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .tarea-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .tarea-fecha {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+
+        /* DIARIO DE TRABAJO */
+        .diario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .diario-card {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid var(--nostalgia);
+            transition: all 0.3s;
+        }
+
+        .diario-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        .diario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .diario-fecha {
+            font-weight: 600;
+            color: var(--nostalgia);
+        }
+
+        .diario-horas {
+            background: rgba(103, 84, 107, 0.1);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+
+        .diario-proyecto {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .diario-descripcion {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 10px 0;
+            color: var(--text-primary);
+        }
+
+        .diario-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .diario-tag {
+            background: rgba(198, 94, 117, 0.1);
+            color: var(--amaranth);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        /* CLIENTES */
+        .clientes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .cliente-card {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 20px;
+            border-top: 5px solid var(--amaranth);
+            transition: all 0.3s;
+        }
+
+        .cliente-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        .cliente-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .cliente-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--nostalgia);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .cliente-nombre {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .cliente-contacto {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cliente-proyectos {
+            font-size: 0.9rem;
+            background: rgba(103, 84, 107, 0.1);
+            padding: 5px 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        /* RESPONSABILIDADES */
+        .responsabilidades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .responsabilidad-card {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid var(--woodlands);
+            transition: all 0.3s;
+        }
+
+        .responsabilidad-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        .responsabilidad-titulo {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .responsabilidad-area {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .responsabilidad-tareas {
+            margin-top: 10px;
+        }
+
+        .sub-tarea {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .sub-tarea.completada {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        /* RECOMENDACIONES */
+        .recomendaciones-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .recomendacion-card {
+            background: linear-gradient(135deg, var(--bg-light), white);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid;
+            transition: all 0.3s;
+        }
+
+        .recomendacion-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .recomendacion-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(198, 94, 117, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--amaranth);
+        }
+
+        .recomendacion-titulo {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .recomendacion-texto {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .recomendacion-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--nostalgia);
+        }
+
+        /* MODALES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--amaranth);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--nostalgia) 0%, var(--amaranth) 100%);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+        }
+
+        .modal-content {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(103, 84, 107, 0.3);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--amaranth);
+            box-shadow: 0 0 0 3px rgba(198, 94, 117, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--nostalgia) 0%, var(--amaranth) 100%);
+            color: var(--text-light);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(103, 84, 107, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--nostalgia);
+            border: 2px solid var(--nostalgia);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(103, 84, 107, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* CARGANDO */
+        .cargando-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            backdrop-filter: blur(3px);
+        }
+
+        .cargando-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid white;
+            border-top-color: var(--amaranth);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .trabajo-nav {
+                flex-wrap: wrap;
+            }
+            
+            .proyecto-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CARGANDO OVERLAY -->
+    <div class="cargando-overlay" id="cargandoOverlay">
+        <div class="cargando-spinner"></div>
+    </div>
+
+    <!-- MODO CUADRITOS COMPACTOS -->
+    <div class="modo-cuadritos fade-in">
+        <header class="main-header">
+            <h1><i class="fas fa-briefcase"></i> Mis Trabajos y Proyectos</h1>
+            <p>Gestiona tus proyectos laborales, tareas diarias y responsabilidades</p>
+            <button class="btn-crear-trabajo" onclick="abrirModalCrearTrabajo()">
+                <i class="fas fa-plus-circle"></i> Nuevo Trabajo
+            </button>
+        </header>
+
+        <div class="cuadritos-grid" id="cuadritosGrid">
+            <!-- Los trabajos se cargarán dinámicamente -->
+        </div>
+    </div>
+
+    <!-- MODO EXPANDIDO PARA TRABAJOS (Plantilla) -->
+    <div id="modoExpandidoTemplate" class="modo-expandido" style="display: none;">
+        <div class="trabajo-expandido-header" id="expandidoHeader">
+            <div class="trabajo-info">
+                <div class="trabajo-logo-expandido" id="expandidoLogo">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="trabajo-titulo-expandido">
+                    <h2 id="expandidoTitulo">Nombre del Trabajo</h2>
+                    <p id="expandidoDescripcion">Empresa • Puesto</p>
+                </div>
+            </div>
+            <button class="btn-cerrar" onclick="cerrarTrabajo()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="trabajo-expandido-estadisticas">
+            <div class="estadistica-expandida">
+                <div class="estadistica-valor" id="expandidoProyectos">0</div>
+                <div class="estadistica-etiqueta">Proyectos</div>
+            </div>
+            <div class="estadistica-expandida">
+                <div class="estadistica-valor" id="expandidoTareasHoy">0</div>
+                <div class="estadistica-etiqueta">Tareas Hoy</div>
+            </div>
+            <div class="estadistica-expandida">
+                <div class="estadistica-valor" id="expandidoClientes">0</div>
+                <div class="estadistica-etiqueta">Clientes</div>
+            </div>
+            <div class="estadistica-expandida">
+                <div class="estadistica-valor" id="expandidoHorasHoy">0</div>
+                <div class="estadistica-etiqueta">Horas Hoy</div>
+            </div>
+        </div>
+
+        <div class="trabajo-contenido">
+            <nav class="trabajo-nav" id="expandidoNav">
+                <button class="trabajo-nav-btn active" data-seccion="proyectos">
+                    <i class="fas fa-project-diagram"></i> Proyectos
+                </button>
+                <button class="trabajo-nav-btn" data-seccion="tareas">
+                    <i class="fas fa-tasks"></i> Tareas Diarias
+                </button>
+                <button class="trabajo-nav-btn" data-seccion="diario">
+                    <i class="fas fa-journal-whills"></i> Diario
+                </button>
+                <button class="trabajo-nav-btn" data-seccion="clientes">
+                    <i class="fas fa-users"></i> Clientes
+                </button>
+                <button class="trabajo-nav-btn" data-seccion="responsabilidades">
+                    <i class="fas fa-clipboard-list"></i> Responsabilidades
+                </button>
+                <button class="trabajo-nav-btn" data-seccion="recomendaciones">
+                    <i class="fas fa-lightbulb"></i> Recomendaciones
+                </button>
+            </nav>
+
+            <!-- SECCIÓN: PROYECTOS -->
+            <section id="expandido-proyectos" class="trabajo-seccion active">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-project-diagram"></i> Proyectos Activos</h3>
+                        <div class="card-actions">
+                            <button class="action-btn btn-add" onclick="abrirModal('proyecto')">
+                                <i class="fas fa-plus"></i> Nuevo Proyecto
+                            </button>
+                        </div>
+                    </div>
+                    <div class="proyectos-grid" id="expandido-proyectosList"></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: TAREAS DIARIAS -->
+            <section id="expandido-tareas" class="trabajo-seccion">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-tasks"></i> Tareas del Día</h3>
+                        <div class="card-actions">
+                            <button class="action-btn btn-add" onclick="abrirModal('tarea')">
+                                <i class="fas fa-plus"></i> Nueva Tarea
+                            </button>
+                        </div>
+                    </div>
+                    <div id="expandido-tareasList"></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: DIARIO DE TRABAJO -->
+            <section id="expandido-diario" class="trabajo-seccion">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-journal-whills"></i> Diario de Trabajo</h3>
+                        <div class="card-actions">
+                            <button class="action-btn btn-add" onclick="abrirModal('diario')">
+                                <i class="fas fa-plus"></i> Nuevo Registro
+                            </button>
+                        </div>
+                    </div>
+                    <div class="diario-grid" id="expandido-diarioList"></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: CLIENTES -->
+            <section id="expandido-clientes" class="trabajo-seccion">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> Clientes</h3>
+                        <div class="card-actions">
+                            <button class="action-btn btn-add" onclick="abrirModal('cliente')">
+                                <i class="fas fa-plus"></i> Nuevo Cliente
+                            </button>
+                        </div>
+                    </div>
+                    <div class="clientes-grid" id="expandido-clientesList"></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: RESPONSABILIDADES -->
+            <section id="expandido-responsabilidades" class="trabajo-seccion">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clipboard-list"></i> Responsabilidades y Áreas</h3>
+                        <div class="card-actions">
+                            <button class="action-btn btn-add" onclick="abrirModal('responsabilidad')">
+                                <i class="fas fa-plus"></i> Nueva Responsabilidad
+                            </button>
+                        </div>
+                    </div>
+                    <div class="responsabilidades-grid" id="expandido-responsabilidadesList"></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: RECOMENDACIONES -->
+            <section id="expandido-recomendaciones" class="trabajo-seccion">
+                <div class="info-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-lightbulb"></i> Recomendaciones y Mejoras</h3>
+                        <div class="card-actions">
+                            <button class="action-btn btn-add" onclick="abrirModal('recomendacion')">
+                                <i class="fas fa-plus"></i> Nueva Recomendación
+                            </button>
+                        </div>
+                    </div>
+                    <div class="recomendaciones-container" id="expandido-recomendacionesList"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- MODAL PARA AGREGAR/EDITAR TRABAJO -->
+    <div class="modal-overlay" id="modalTrabajoOverlay">
+        <div class="modal slide-in">
+            <div class="modal-header">
+                <h3 id="modalTrabajoTitle">Nuevo Trabajo</h3>
+                <button class="action-btn btn-secondary" onclick="cerrarModalTrabajo()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <form class="modal-form" id="modalTrabajoForm" onsubmit="event.preventDefault(); guardarTrabajo();">
+                    <div class="form-group">
+                        <label><i class="fas fa-briefcase"></i> Nombre del Trabajo/Puesto</label>
+                        <input type="text" id="trabajoNombre" required placeholder="Ej: Desarrollador Frontend">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-building"></i> Empresa</label>
+                        <input type="text" id="trabajoEmpresa" required placeholder="Ej: Tecnología SA">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Fecha Inicio</label>
+                            <input type="date" id="trabajoFechaInicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-clock"></i> Tipo</label>
+                            <select id="trabajoTipo" required>
+                                <option value="Tiempo Completo">Tiempo Completo</option>
+                                <option value="Medio Tiempo">Medio Tiempo</option>
+                                <option value="Freelance">Freelance</option>
+                                <option value="Remoto">Remoto</option>
+                                <option value="Híbrido">Híbrido</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-palette"></i> Color</label>
+                        <select id="trabajoColor" required>
+                            <option value="#67546B">Nostalgia</option>
+                            <option value="#C65E75">Amaranth</option>
+                            <option value="#2A342E">Woodlands</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModalTrabajo()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Guardar Trabajo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA AGREGAR/EDITAR ELEMENTOS -->
+    <div class="modal-overlay" id="modalElementoOverlay">
+        <div class="modal slide-in">
+            <div class="modal-header">
+                <h3 id="modalElementoTitle">Agregar Nuevo</h3>
+                <button class="action-btn btn-secondary" onclick="cerrarModalElemento()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <form class="modal-form" id="modalElementoForm">
+                    <!-- Formulario generado dinámicamente -->
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== VARIABLES GLOBALES =====
+        let trabajosData = [];
+        let nextId = 1;
+        let trabajoExpandidoActual = null;
+        let elementoModalConfig = {
+            tipo: null,
+            trabajoId: null,
+            editingIndex: null,
+            editingId: null
+        };
+        let trabajoEditandoId = null;
+
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarTrabajosDesdeStorage();
+            if (trabajosData.length === 0) {
+                cargarTrabajosEjemplo();
+            }
+            renderizarCuadritos();
+            configurarEventListeners();
+            actualizarFechasPorDefecto();
+        });
+
+        function actualizarFechasPorDefecto() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('trabajoFechaInicio').value = hoy;
+        }
+
+        // ===== FUNCIONES DE ALMACENAMIENTO =====
+        function guardarTrabajosEnStorage() {
+            localStorage.setItem('trabajosData', JSON.stringify(trabajosData));
+            localStorage.setItem('nextIdTrabajo', nextId.toString());
+        }
+
+        function cargarTrabajosDesdeStorage() {
+            const stored = localStorage.getItem('trabajosData');
+            if (stored) {
+                trabajosData = JSON.parse(stored);
+                const storedNextId = localStorage.getItem('nextIdTrabajo');
+                nextId = storedNextId ? parseInt(storedNextId) : Math.max(...trabajosData.map(c => c.id), 0) + 1;
+            }
+        }
+
+        // ===== TRABAJOS DE EJEMPLO =====
+        function cargarTrabajosEjemplo() {
+            const hoy = new Date();
+            const ayer = new Date(hoy);
+            ayer.setDate(ayer.getDate() - 1);
+            
+            trabajosData = [
+                {
+                    id: 1,
+                    nombre: "Desarrollador Frontend",
+                    empresa: "Tecnología Innovadora SA",
+                    fechaInicio: "2024-01-15",
+                    tipo: "Tiempo Completo",
+                    color: "#C65E75",
+                    icono: "fa-code",
+                    proyectos: [
+                        {
+                            id: 101,
+                            nombre: "Rediseño Web Corporativa",
+                            cliente: "Empresa XYZ",
+                            fechaInicio: "2024-03-01",
+                            fechaEntrega: "2024-04-15",
+                            presupuesto: 5000,
+                            estado: "progreso",
+                            progreso: 65,
+                            tareasDiarias: [
+                                { id: 1001, descripcion: "Maquetar header", completada: true },
+                                { id: 1002, descripcion: "Implementar responsive", completada: false }
+                            ]
+                        },
+                        {
+                            id: 102,
+                            nombre: "App Móvil Cliente",
+                            cliente: "Startup ABC",
+                            fechaInicio: "2024-02-10",
+                            fechaEntrega: "2024-05-30",
+                            presupuesto: 8000,
+                            estado: "progreso",
+                            progreso: 30,
+                            tareasDiarias: [
+                                { id: 1003, descripcion: "Diseñar prototipo", completada: true }
+                            ]
+                        }
+                    ],
+                    tareas: [
+                        { id: 201, proyectoId: 101, descripcion: "Reunión con cliente", fecha: hoy.toISOString().split('T')[0], completada: false, horas: 1 },
+                        { id: 202, proyectoId: 102, descripcion: "Revisar código", fecha: hoy.toISOString().split('T')[0], completada: true, horas: 2 }
+                    ],
+                    diario: [
+                        {
+                            id: 301,
+                            fecha: ayer.toISOString().split('T')[0],
+                            proyecto: "Rediseño Web",
+                            horas: 6,
+                            descripcion: "Avancé con el maquetado de la página principal. Implementé el carrusel de imágenes.",
+                            tags: ["desarrollo", "css", "html"]
+                        },
+                        {
+                            id: 302,
+                            fecha: ayer.toISOString().split('T')[0],
+                            proyecto: "App Móvil",
+                            horas: 2,
+                            descripcion: "Revisión de requisitos con el equipo. Definimos las siguientes sprints.",
+                            tags: ["reunión", "planificación"]
+                        }
+                    ],
+                    clientes: [
+                        {
+                            id: 401,
+                            nombre: "Carlos Rodríguez",
+                            empresa: "Empresa XYZ",
+                            email: "carlos@xyz.com",
+                            telefono: "123-456-789",
+                            proyectos: ["Rediseño Web Corporativa"]
+                        },
+                        {
+                            id: 402,
+                            nombre: "Ana Martínez",
+                            empresa: "Startup ABC",
+                            email: "ana@abc.com",
+                            telefono: "987-654-321",
+                            proyectos: ["App Móvil Cliente"]
+                        }
+                    ],
+                    responsabilidades: [
+                        {
+                            id: 501,
+                            titulo: "Desarrollo Frontend",
+                            area: "Técnica",
+                            tareas: [
+                                "Mantener código limpio",
+                                "Seguir buenas prácticas",
+                                "Documentar cambios"
+                            ]
+                        },
+                        {
+                            id: 502,
+                            titulo: "Comunicación con Clientes",
+                            area: "Soft Skills",
+                            tareas: [
+                                "Reuniones semanales",
+                                "Reportes de avance",
+                                "Resolver dudas"
+                            ]
+                        }
+                    ],
+                    recomendaciones: [
+                        {
+                            id: 601,
+                            titulo: "Mejorar rendimiento",
+                            descripcion: "Optimizar imágenes y recursos para mejorar velocidad de carga",
+                            prioridad: "alta",
+                            fecha: "2024-03-15"
+                        },
+                        {
+                            id: 602,
+                            titulo: "Documentación técnica",
+                            descripcion: "Crear documentación para el equipo sobre los nuevos componentes",
+                            prioridad: "media",
+                            fecha: "2024-03-20"
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    nombre: "Diseñador UX/UI",
+                    empresa: "Agencia Creativa",
+                    fechaInicio: "2024-02-01",
+                    tipo: "Freelance",
+                    color: "#67546B",
+                    icono: "fa-paint-brush",
+                    proyectos: [
+                        {
+                            id: 201,
+                            nombre: "App de Finanzas",
+                            cliente: "Banco Nacional",
+                            fechaInicio: "2024-02-15",
+                            fechaEntrega: "2024-04-30",
+                            presupuesto: 6000,
+                            estado: "progreso",
+                            progreso: 45
+                        }
+                    ],
+                    tareas: [],
+                    diario: [],
+                    clientes: [],
+                    responsabilidades: [],
+                    recomendaciones: []
+                }
+            ];
+            nextId = 3;
+            guardarTrabajosEnStorage();
+        }
+
+        // ===== RENDERIZADO DE CUADRITOS =====
+        function renderizarCuadritos() {
+            const grid = document.getElementById('cuadritosGrid');
+            grid.innerHTML = '';
+            
+            trabajosData.forEach(trabajo => {
+                const proyectosActivos = trabajo.proyectos.filter(p => p.estado !== 'completado').length;
+                const tareasHoy = contarTareasHoy(trabajo.tareas);
+                
+                const cuadrito = document.createElement('div');
+                cuadrito.className = 'cuadrito-trabajo';
+                cuadrito.dataset.trabajoId = trabajo.id;
+                
+                cuadrito.innerHTML = `
+                    <div class="cuadrito-header" style="background: linear-gradient(135deg, ${trabajo.color} 0%, ${ajustarColor(trabajo.color, 20)} 100%);">
+                        <div class="cuadrito-logo" style="background: rgba(255, 255, 255, 0.3);">
+                            <i class="fas ${trabajo.icono || 'fa-briefcase'}"></i>
+                        </div>
+                        <h3 class="cuadrito-titulo">${trabajo.nombre}</h3>
+                        <p class="cuadrito-empresa">${trabajo.empresa} • ${trabajo.tipo}</p>
+                        <div class="cuadrito-estadisticas">
+                            <div class="cuadrito-estadistica">
+                                <div class="valor">${proyectosActivos}</div>
+                                <div class="etiqueta">Proyectos</div>
+                            </div>
+                            <div class="cuadrito-estadistica">
+                                <div class="valor">${tareasHoy}</div>
+                                <div class="etiqueta">Tareas</div>
+                            </div>
+                            <div class="cuadrito-estadistica">
+                                <div class="valor">${trabajo.clientes.length}</div>
+                                <div class="etiqueta">Clientes</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cuadrito-expandir">
+                        <button class="btn-expandir" onclick="expandirTrabajo(${trabajo.id})">
+                            <i class="fas fa-expand-alt"></i> Ver Detalles
+                        </button>
+                        <button class="btn-editar-trabajo" onclick="abrirModalEditarTrabajo(${trabajo.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-eliminar-trabajo" onclick="eliminarTrabajo(${trabajo.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(cuadrito);
+            });
+        }
+
+        function ajustarColor(color, porcentaje) {
+            // Función simple para aclarar/oscurecer colores
+            if (color === '#67546B') return '#8A6B8F';
+            if (color === '#C65E75') return '#D97A8E';
+            if (color === '#2A342E') return '#3E4E43';
+            return color;
+        }
+
+        function contarTareasHoy(tareas) {
+            const hoy = new Date().toISOString().split('T')[0];
+            return tareas.filter(t => t.fecha === hoy && !t.completada).length;
+        }
+
+        // ===== FUNCIONES DE EXPANSIÓN =====
+        function expandirTrabajo(trabajoId) {
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajoExpandidoActual = trabajoId;
+            
+            const template = document.getElementById('modoExpandidoTemplate');
+            const clone = template.cloneNode(true);
+            clone.id = `modoExpandido${trabajoId}`;
+            clone.style.display = 'block';
+            document.body.appendChild(clone);
+            
+            personalizarExpandido(clone, trabajo);
+            
+            clone.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            configurarNavegacionExpandido(clone, trabajoId);
+        }
+
+        function personalizarExpandido(container, trabajo) {
+            container.querySelector('#expandidoHeader').style.background = 
+                `linear-gradient(135deg, ${trabajo.color} 0%, ${ajustarColor(trabajo.color, 20)} 100%)`;
+            container.querySelector('#expandidoLogo i').className = `fas ${trabajo.icono || 'fa-briefcase'}`;
+            container.querySelector('#expandidoTitulo').textContent = trabajo.nombre;
+            container.querySelector('#expandidoDescripcion').textContent = 
+                `${trabajo.empresa} • ${trabajo.tipo}`;
+            
+            const secciones = ['proyectos', 'tareas', 'diario', 'clientes', 'responsabilidades', 'recomendaciones'];
+            secciones.forEach(seccion => {
+                const elemento = container.querySelector(`#expandido-${seccion}`);
+                if (elemento) {
+                    elemento.id = `expandido-${seccion}-${trabajo.id}`;
+                }
+                
+                const lista = container.querySelector(`#expandido-${seccion}List`);
+                if (lista) {
+                    lista.id = `expandido-${seccion}List-${trabajo.id}`;
+                }
+            });
+            
+            renderizarProyectosExpandidos(trabajo.id);
+            renderizarTareasExpandidas(trabajo.id);
+            renderizarDiarioExpandido(trabajo.id);
+            renderizarClientesExpandidos(trabajo.id);
+            renderizarResponsabilidadesExpandidas(trabajo.id);
+            renderizarRecomendacionesExpandidas(trabajo.id);
+            
+            actualizarEstadisticasExpandidas(trabajo.id);
+        }
+
+        function configurarNavegacionExpandido(container, trabajoId) {
+            const buttons = container.querySelectorAll('.trabajo-nav-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const seccion = this.dataset.seccion;
+                    
+                    buttons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    container.querySelectorAll('.trabajo-seccion').forEach(s => {
+                        s.classList.remove('active');
+                    });
+                    
+                    const seccionElement = container.querySelector(`#expandido-${seccion}-${trabajoId}`);
+                    if (seccionElement) {
+                        seccionElement.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        function cerrarTrabajo() {
+            if (trabajoExpandidoActual) {
+                const elemento = document.getElementById(`modoExpandido${trabajoExpandidoActual}`);
+                if (elemento) {
+                    elemento.remove();
+                }
+                document.body.style.overflow = 'auto';
+                trabajoExpandidoActual = null;
+            }
+        }
+
+        // ===== RENDERIZADO DE DATOS EXPANDIDOS =====
+        function renderizarProyectosExpandidos(trabajoId) {
+            const container = document.getElementById(`expandido-proyectosList-${trabajoId}`);
+            if (!container) return;
+            
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            if (trabajo.proyectos.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h3>No hay proyectos</h3>
+                        <p>Agrega tu primer proyecto usando el botón superior</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = trabajo.proyectos.map((proyecto, index) => `
+                <div class="proyecto-card" style="border-left-color: ${trabajo.color}">
+                    <div class="proyecto-header">
+                        <div class="proyecto-nombre">
+                            <i class="fas fa-folder-open"></i>
+                            ${proyecto.nombre}
+                        </div>
+                        <div class="proyecto-cliente">${proyecto.cliente || 'Sin cliente'}</div>
+                    </div>
+                    
+                    <div class="proyecto-info">
+                        <div class="info-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Inicio: ${formatearFecha(proyecto.fechaInicio)}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-hourglass-end"></i>
+                            <span>Entrega: ${formatearFecha(proyecto.fechaEntrega)}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>$${proyecto.presupuesto?.toLocaleString() || '0'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="estado-badge estado-${proyecto.estado}">
+                                ${proyecto.estado === 'progreso' ? 'En Progreso' : 
+                                  proyecto.estado === 'pendiente' ? 'Pendiente' : 
+                                  proyecto.estado === 'revision' ? 'En Revisión' : 'Completado'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="progreso-container">
+                        <div class="progreso-label">
+                            <span>Progreso</span>
+                            <span>${proyecto.progreso || 0}%</span>
+                        </div>
+                        <div class="progreso-bar">
+                            <div class="progreso-fill" style="width: ${proyecto.progreso || 0}%; background: ${trabajo.color}"></div>
+                        </div>
+                    </div>
+                    
+                    ${proyecto.tareasDiarias ? `
+                        <div class="tareas-diarias">
+                            <small><i class="fas fa-tasks"></i> Tareas del proyecto:</small>
+                            ${proyecto.tareasDiarias.map(t => `
+                                <div class="tarea-item ${t.completada ? 'completada' : ''}">
+                                    <input type="checkbox" ${t.completada ? 'checked' : ''} 
+                                           onchange="marcarTareaProyecto(${trabajoId}, ${proyecto.id}, ${t.id}, this.checked)">
+                                    <span>${t.descripcion}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="card-actions" style="margin-top: 15px;">
+                        <button class="action-btn btn-edit" onclick="editarProyecto(${trabajoId}, ${proyecto.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="action-btn btn-delete" onclick="eliminarProyecto(${trabajoId}, ${proyecto.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderizarTareasExpandidas(trabajoId) {
+            const container = document.getElementById(`expandido-tareasList-${trabajoId}`);
+            if (!container) return;
+            
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            const hoy = new Date().toISOString().split('T')[0];
+            const tareasHoy = trabajo.tareas.filter(t => t.fecha === hoy);
+            
+            if (tareasHoy.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h3>No hay tareas para hoy</h3>
+                        <p>Agrega tu primera tarea usando el botón superior</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="tareas-diarias">
+                    ${tareasHoy.map(tarea => `
+                        <div class="tarea-item ${tarea.completada ? 'completada' : ''}">
+                            <input type="checkbox" ${tarea.completada ? 'checked' : ''} 
+                                   onchange="marcarTarea(${trabajoId}, ${tarea.id}, this.checked)">
+                            <div style="flex: 1;">
+                                <div>${tarea.descripcion}</div>
+                                <small class="tarea-fecha">
+                                    <i class="fas fa-clock"></i> ${tarea.horas || 0} horas
+                                </small>
+                            </div>
+                            <div class="card-actions">
+                                <button class="action-btn btn-edit" onclick="editarTarea(${trabajoId}, ${tarea.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn btn-delete" onclick="eliminarTarea(${trabajoId}, ${tarea.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderizarDiarioExpandido(trabajoId) {
+            const container = document.getElementById(`expandido-diarioList-${trabajoId}`);
+            if (!container) return;
+            
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            if (trabajo.diario.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-journal-whills" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h3>No hay registros en el diario</h3>
+                        <p>Agrega tu primer registro usando el botón superior</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = trabajo.diario.map(entry => `
+                <div class="diario-card">
+                    <div class="diario-header">
+                        <span class="diario-fecha">${formatearFecha(entry.fecha)}</span>
+                        <span class="diario-horas"><i class="fas fa-clock"></i> ${entry.horas} horas</span>
+                    </div>
+                    <div class="diario-proyecto">
+                        <i class="fas fa-project-diagram"></i> ${entry.proyecto}
+                    </div>
+                    <div class="diario-descripcion">
+                        ${entry.descripcion}
+                    </div>
+                    <div class="diario-tags">
+                        ${entry.tags.map(tag => `<span class="diario-tag">#${tag}</span>`).join('')}
+                    </div>
+                    <div class="card-actions" style="margin-top: 15px;">
+                        <button class="action-btn btn-edit" onclick="editarDiario(${trabajoId}, ${entry.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="action-btn btn-delete" onclick="eliminarDiario(${trabajoId}, ${entry.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderizarClientesExpandidos(trabajoId) {
+            const container = document.getElementById(`expandido-clientesList-${trabajoId}`);
+            if (!container) return;
+            
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            if (trabajo.clientes.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h3>No hay clientes</h3>
+                        <p>Agrega tu primer cliente usando el botón superior</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = trabajo.clientes.map(cliente => `
+                <div class="cliente-card">
+                    <div class="cliente-header">
+                        <div class="cliente-avatar">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <div class="cliente-nombre">${cliente.nombre}</div>
+                            <div class="cliente-empresa">${cliente.empresa}</div>
+                        </div>
+                    </div>
+                    <div class="cliente-contacto">
+                        <i class="fas fa-envelope"></i> ${cliente.email}
+                    </div>
+                    <div class="cliente-contacto">
+                        <i class="fas fa-phone"></i> ${cliente.telefono}
+                    </div>
+                    <div class="cliente-proyectos">
+                        <i class="fas fa-folder-open"></i> ${cliente.proyectos?.length || 0} proyectos
+                    </div>
+                    <div class="card-actions" style="margin-top: 15px;">
+                        <button class="action-btn btn-edit" onclick="editarCliente(${trabajoId}, ${cliente.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="action-btn btn-delete" onclick="eliminarCliente(${trabajoId}, ${cliente.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderizarResponsabilidadesExpandidas(trabajoId) {
+            const container = document.getElementById(`expandido-responsabilidadesList-${trabajoId}`);
+            if (!container) return;
+            
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            if (trabajo.responsabilidades.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h3>No hay responsabilidades</h3>
+                        <p>Agrega tu primera responsabilidad usando el botón superior</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = trabajo.responsabilidades.map(resp => `
+                <div class="responsabilidad-card">
+                    <div class="responsabilidad-titulo">${resp.titulo}</div>
+                    <div class="responsabilidad-area">Área: ${resp.area}</div>
+                    <div class="responsabilidad-tareas">
+                        ${resp.tareas.map(tarea => `
+                            <div class="sub-tarea">
+                                <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                                ${tarea}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="card-actions" style="margin-top: 15px;">
+                        <button class="action-btn btn-edit" onclick="editarResponsabilidad(${trabajoId}, ${resp.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="action-btn btn-delete" onclick="eliminarResponsabilidad(${trabajoId}, ${resp.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderizarRecomendacionesExpandidas(trabajoId) {
+            const container = document.getElementById(`expandido-recomendacionesList-${trabajoId}`);
+            if (!container) return;
+            
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            if (trabajo.recomendaciones.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-lightbulb" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h3>No hay recomendaciones</h3>
+                        <p>Agrega tu primera recomendación usando el botón superior</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = trabajo.recomendaciones.map(rec => `
+                <div class="recomendacion-card" style="border-left-color: ${rec.prioridad === 'alta' ? '#F44336' : rec.prioridad === 'media' ? '#FF9800' : '#4CAF50'}">
+                    <div class="recomendacion-header">
+                        <div class="recomendacion-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="recomendacion-titulo">${rec.titulo}</div>
+                    </div>
+                    <div class="recomendacion-texto">
+                        ${rec.descripcion}
+                    </div>
+                    <div class="recomendacion-meta">
+                        <span><i class="fas fa-flag"></i> Prioridad: ${rec.prioridad}</span>
+                        <span><i class="far fa-calendar"></i> ${formatearFecha(rec.fecha)}</span>
+                    </div>
+                    <div class="card-actions" style="margin-top: 15px;">
+                        <button class="action-btn btn-done" onclick="completarRecomendacion(${trabajoId}, ${rec.id})">
+                            <i class="fas fa-check"></i> Completar
+                        </button>
+                        <button class="action-btn btn-edit" onclick="editarRecomendacion(${trabajoId}, ${rec.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="action-btn btn-delete" onclick="eliminarRecomendacion(${trabajoId}, ${rec.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== ESTADÍSTICAS EXPANDIDAS =====
+        function actualizarEstadisticasExpandidas(trabajoId) {
+            const container = document.getElementById(`modoExpandido${trabajoId}`);
+            if (!container) return;
+            
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            const hoy = new Date().toISOString().split('T')[0];
+            const tareasHoy = trabajo.tareas.filter(t => t.fecha === hoy && !t.completada).length;
+            
+            const horasHoy = trabajo.diario
+                .filter(d => d.fecha === hoy)
+                .reduce((acc, d) => acc + d.horas, 0);
+            
+            container.querySelector('#expandidoProyectos').textContent = trabajo.proyectos.length;
+            container.querySelector('#expandidoTareasHoy').textContent = tareasHoy;
+            container.querySelector('#expandidoClientes').textContent = trabajo.clientes.length;
+            container.querySelector('#expandidoHorasHoy').textContent = horasHoy;
+        }
+
+        // ===== FUNCIONES DE ACCIÓN PARA EDICIÓN/ELIMINACIÓN =====
+        function editarProyecto(trabajoId, proyectoId) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            const proyecto = trabajo.proyectos.find(p => p.id === proyectoId);
+            if (!proyecto) return;
+            
+            elementoModalConfig.tipo = 'proyecto';
+            elementoModalConfig.trabajoId = trabajoId;
+            elementoModalConfig.editingId = proyectoId;
+            
+            const modal = document.getElementById('modalElementoOverlay');
+            const title = document.getElementById('modalElementoTitle');
+            const form = document.getElementById('modalElementoForm');
+            
+            title.textContent = `Editar Proyecto - ${trabajo.nombre}`;
+            form.innerHTML = `
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Nombre del Proyecto</label>
+                    <input type="text" id="proyectoNombre" value="${proyecto.nombre}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tie"></i> Cliente</label>
+                    <input type="text" id="proyectoCliente" value="${proyecto.cliente || ''}" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Fecha Inicio</label>
+                        <input type="date" id="proyectoFechaInicio" value="${proyecto.fechaInicio}" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-check"></i> Fecha Entrega</label>
+                        <input type="date" id="proyectoFechaEntrega" value="${proyecto.fechaEntrega}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-money-bill"></i> Presupuesto ($)</label>
+                    <input type="number" id="proyectoPresupuesto" min="0" value="${proyecto.presupuesto || 0}">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> Estado</label>
+                    <select id="proyectoEstado">
+                        <option value="pendiente" ${proyecto.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                        <option value="progreso" ${proyecto.estado === 'progreso' ? 'selected' : ''}>En Progreso</option>
+                        <option value="revision" ${proyecto.estado === 'revision' ? 'selected' : ''}>En Revisión</option>
+                        <option value="completado" ${proyecto.estado === 'completado' ? 'selected' : ''}>Completado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percentage"></i> Progreso (%)</label>
+                    <input type="number" id="proyectoProgreso" min="0" max="100" value="${proyecto.progreso || 0}">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </div>
+            `;
+            
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                guardarElementoEditado();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function eliminarProyecto(trabajoId, proyectoId) {
+            if (!confirm('¿Estás seguro de eliminar este proyecto?')) return;
+            
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajo.proyectos = trabajo.proyectos.filter(p => p.id !== proyectoId);
+            
+            guardarTrabajosEnStorage();
+            renderizarProyectosExpandidos(trabajoId);
+            renderizarCuadritos();
+            mostrarNotificacion('Proyecto eliminado');
+        }
+
+        function editarTarea(trabajoId, tareaId) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            const tarea = trabajo.tareas.find(t => t.id === tareaId);
+            if (!tarea) return;
+            
+            elementoModalConfig.tipo = 'tarea';
+            elementoModalConfig.trabajoId = trabajoId;
+            elementoModalConfig.editingId = tareaId;
+            
+            const modal = document.getElementById('modalElementoOverlay');
+            const title = document.getElementById('modalElementoTitle');
+            const form = document.getElementById('modalElementoForm');
+            
+            title.textContent = `Editar Tarea - ${trabajo.nombre}`;
+            form.innerHTML = `
+                <div class="form-group">
+                    <label><i class="fas fa-tasks"></i> Descripción de la Tarea</label>
+                    <input type="text" id="tareaDescripcion" value="${tarea.descripcion}" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Fecha</label>
+                        <input type="date" id="tareaFecha" value="${tarea.fecha}" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Horas estimadas</label>
+                        <input type="number" id="tareaHoras" min="0.5" step="0.5" value="${tarea.horas || 1}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-project-diagram"></i> Proyecto relacionado</label>
+                    <select id="tareaProyecto">
+                        <option value="">Sin proyecto</option>
+                        ${trabajo.proyectos.map(p => `<option value="${p.id}" ${p.id === tarea.proyectoId ? 'selected' : ''}>${p.nombre}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </div>
+            `;
+            
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                guardarElementoEditado();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function eliminarTarea(trabajoId, tareaId) {
+            if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
+            
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajo.tareas = trabajo.tareas.filter(t => t.id !== tareaId);
+            
+            guardarTrabajosEnStorage();
+            renderizarTareasExpandidas(trabajoId);
+            actualizarEstadisticasExpandidas(trabajoId);
+            renderizarCuadritos();
+            mostrarNotificacion('Tarea eliminada');
+        }
+
+        function editarDiario(trabajoId, diarioId) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            const diario = trabajo.diario.find(d => d.id === diarioId);
+            if (!diario) return;
+            
+            elementoModalConfig.tipo = 'diario';
+            elementoModalConfig.trabajoId = trabajoId;
+            elementoModalConfig.editingId = diarioId;
+            
+            const modal = document.getElementById('modalElementoOverlay');
+            const title = document.getElementById('modalElementoTitle');
+            const form = document.getElementById('modalElementoForm');
+            
+            title.textContent = `Editar Registro - ${trabajo.nombre}`;
+            form.innerHTML = `
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Fecha</label>
+                    <input type="date" id="diarioFecha" value="${diario.fecha}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Horas trabajadas</label>
+                    <input type="number" id="diarioHoras" min="0.5" step="0.5" value="${diario.horas}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-project-diagram"></i> Proyecto</label>
+                    <input type="text" id="diarioProyecto" value="${diario.proyecto}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="diarioDescripcion" rows="4" required>${diario.descripcion}</textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tags"></i> Tags (separados por coma)</label>
+                    <input type="text" id="diarioTags" value="${diario.tags.join(', ')}">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </div>
+            `;
+            
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                guardarElementoEditado();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function eliminarDiario(trabajoId, diarioId) {
+            if (!confirm('¿Estás seguro de eliminar este registro?')) return;
+            
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajo.diario = trabajo.diario.filter(d => d.id !== diarioId);
+            
+            guardarTrabajosEnStorage();
+            renderizarDiarioExpandido(trabajoId);
+            actualizarEstadisticasExpandidas(trabajoId);
+            renderizarCuadritos();
+            mostrarNotificacion('Registro eliminado');
+        }
+
+        function editarCliente(trabajoId, clienteId) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            const cliente = trabajo.clientes.find(c => c.id === clienteId);
+            if (!cliente) return;
+            
+            elementoModalConfig.tipo = 'cliente';
+            elementoModalConfig.trabajoId = trabajoId;
+            elementoModalConfig.editingId = clienteId;
+            
+            const modal = document.getElementById('modalElementoOverlay');
+            const title = document.getElementById('modalElementoTitle');
+            const form = document.getElementById('modalElementoForm');
+            
+            title.textContent = `Editar Cliente - ${trabajo.nombre}`;
+            form.innerHTML = `
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nombre del Cliente</label>
+                    <input type="text" id="clienteNombre" value="${cliente.nombre}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Empresa</label>
+                    <input type="text" id="clienteEmpresa" value="${cliente.empresa}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="clienteEmail" value="${cliente.email}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Teléfono</label>
+                    <input type="text" id="clienteTelefono" value="${cliente.telefono || ''}">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </div>
+            `;
+            
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                guardarElementoEditado();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function eliminarCliente(trabajoId, clienteId) {
+            if (!confirm('¿Estás seguro de eliminar este cliente?')) return;
+            
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajo.clientes = trabajo.clientes.filter(c => c.id !== clienteId);
+            
+            guardarTrabajosEnStorage();
+            renderizarClientesExpandidos(trabajoId);
+            renderizarCuadritos();
+            mostrarNotificacion('Cliente eliminado');
+        }
+
+        function editarResponsabilidad(trabajoId, respId) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            const resp = trabajo.responsabilidades.find(r => r.id === respId);
+            if (!resp) return;
+            
+            elementoModalConfig.tipo = 'responsabilidad';
+            elementoModalConfig.trabajoId = trabajoId;
+            elementoModalConfig.editingId = respId;
+            
+            const modal = document.getElementById('modalElementoOverlay');
+            const title = document.getElementById('modalElementoTitle');
+            const form = document.getElementById('modalElementoForm');
+            
+            title.textContent = `Editar Responsabilidad - ${trabajo.nombre}`;
+            form.innerHTML = `
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="respTitulo" value="${resp.titulo}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Área</label>
+                    <input type="text" id="respArea" value="${resp.area}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tasks"></i> Tareas (una por línea)</label>
+                    <textarea id="respTareas" rows="4" required>${resp.tareas.join('\n')}</textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </div>
+            `;
+            
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                guardarElementoEditado();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function eliminarResponsabilidad(trabajoId, respId) {
+            if (!confirm('¿Estás seguro de eliminar esta responsabilidad?')) return;
+            
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajo.responsabilidades = trabajo.responsabilidades.filter(r => r.id !== respId);
+            
+            guardarTrabajosEnStorage();
+            renderizarResponsabilidadesExpandidas(trabajoId);
+            renderizarCuadritos();
+            mostrarNotificacion('Responsabilidad eliminada');
+        }
+
+        function editarRecomendacion(trabajoId, recId) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            const rec = trabajo.recomendaciones.find(r => r.id === recId);
+            if (!rec) return;
+            
+            elementoModalConfig.tipo = 'recomendacion';
+            elementoModalConfig.trabajoId = trabajoId;
+            elementoModalConfig.editingId = recId;
+            
+            const modal = document.getElementById('modalElementoOverlay');
+            const title = document.getElementById('modalElementoTitle');
+            const form = document.getElementById('modalElementoForm');
+            
+            title.textContent = `Editar Recomendación - ${trabajo.nombre}`;
+            form.innerHTML = `
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="recTitulo" value="${rec.titulo}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="recDescripcion" rows="3" required>${rec.descripcion}</textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-flag"></i> Prioridad</label>
+                        <select id="recPrioridad">
+                            <option value="alta" ${rec.prioridad === 'alta' ? 'selected' : ''}>Alta</option>
+                            <option value="media" ${rec.prioridad === 'media' ? 'selected' : ''}>Media</option>
+                            <option value="baja" ${rec.prioridad === 'baja' ? 'selected' : ''}>Baja</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Fecha</label>
+                        <input type="date" id="recFecha" value="${rec.fecha}">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </div>
+            `;
+            
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                guardarElementoEditado();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function eliminarRecomendacion(trabajoId, recId) {
+            if (!confirm('¿Estás seguro de eliminar esta recomendación?')) return;
+            
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajo.recomendaciones = trabajo.recomendaciones.filter(r => r.id !== recId);
+            
+            guardarTrabajosEnStorage();
+            renderizarRecomendacionesExpandidas(trabajoId);
+            renderizarCuadritos();
+            mostrarNotificacion('Recomendación eliminada');
+        }
+
+        function guardarElementoEditado() {
+            const tipo = elementoModalConfig.tipo;
+            const trabajoId = elementoModalConfig.trabajoId;
+            const editingId = elementoModalConfig.editingId;
+            const form = document.getElementById('modalElementoForm');
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            
+            switch(tipo) {
+                case 'proyecto':
+                    const proyectoIndex = trabajo.proyectos.findIndex(p => p.id === editingId);
+                    if (proyectoIndex !== -1) {
+                        trabajo.proyectos[proyectoIndex] = {
+                            ...trabajo.proyectos[proyectoIndex],
+                            nombre: form.querySelector('#proyectoNombre').value,
+                            cliente: form.querySelector('#proyectoCliente').value,
+                            fechaInicio: form.querySelector('#proyectoFechaInicio').value,
+                            fechaEntrega: form.querySelector('#proyectoFechaEntrega').value,
+                            presupuesto: parseFloat(form.querySelector('#proyectoPresupuesto').value) || 0,
+                            estado: form.querySelector('#proyectoEstado').value,
+                            progreso: parseInt(form.querySelector('#proyectoProgreso').value) || 0
+                        };
+                    }
+                    break;
+                    
+                case 'tarea':
+                    const tareaIndex = trabajo.tareas.findIndex(t => t.id === editingId);
+                    if (tareaIndex !== -1) {
+                        trabajo.tareas[tareaIndex] = {
+                            ...trabajo.tareas[tareaIndex],
+                            descripcion: form.querySelector('#tareaDescripcion').value,
+                            fecha: form.querySelector('#tareaFecha').value,
+                            horas: parseFloat(form.querySelector('#tareaHoras').value) || 1,
+                            proyectoId: form.querySelector('#tareaProyecto').value || null
+                        };
+                    }
+                    break;
+                    
+                case 'diario':
+                    const diarioIndex = trabajo.diario.findIndex(d => d.id === editingId);
+                    if (diarioIndex !== -1) {
+                        const tags = form.querySelector('#diarioTags').value
+                            .split(',')
+                            .map(t => t.trim())
+                            .filter(t => t);
+                        
+                        trabajo.diario[diarioIndex] = {
+                            ...trabajo.diario[diarioIndex],
+                            fecha: form.querySelector('#diarioFecha').value,
+                            horas: parseFloat(form.querySelector('#diarioHoras').value),
+                            proyecto: form.querySelector('#diarioProyecto').value,
+                            descripcion: form.querySelector('#diarioDescripcion').value,
+                            tags: tags
+                        };
+                    }
+                    break;
+                    
+                case 'cliente':
+                    const clienteIndex = trabajo.clientes.findIndex(c => c.id === editingId);
+                    if (clienteIndex !== -1) {
+                        trabajo.clientes[clienteIndex] = {
+                            ...trabajo.clientes[clienteIndex],
+                            nombre: form.querySelector('#clienteNombre').value,
+                            empresa: form.querySelector('#clienteEmpresa').value,
+                            email: form.querySelector('#clienteEmail').value,
+                            telefono: form.querySelector('#clienteTelefono').value
+                        };
+                    }
+                    break;
+                    
+                case 'responsabilidad':
+                    const respIndex = trabajo.responsabilidades.findIndex(r => r.id === editingId);
+                    if (respIndex !== -1) {
+                        const tareas = form.querySelector('#respTareas').value
+                            .split('\n')
+                            .map(t => t.trim())
+                            .filter(t => t);
+                        
+                        trabajo.responsabilidades[respIndex] = {
+                            ...trabajo.responsabilidades[respIndex],
+                            titulo: form.querySelector('#respTitulo').value,
+                            area: form.querySelector('#respArea').value,
+                            tareas: tareas
+                        };
+                    }
+                    break;
+                    
+                case 'recomendacion':
+                    const recIndex = trabajo.recomendaciones.findIndex(r => r.id === editingId);
+                    if (recIndex !== -1) {
+                        trabajo.recomendaciones[recIndex] = {
+                            ...trabajo.recomendaciones[recIndex],
+                            titulo: form.querySelector('#recTitulo').value,
+                            descripcion: form.querySelector('#recDescripcion').value,
+                            prioridad: form.querySelector('#recPrioridad').value,
+                            fecha: form.querySelector('#recFecha').value
+                        };
+                    }
+                    break;
+            }
+            
+            guardarTrabajosEnStorage();
+            
+            renderizarProyectosExpandidos(trabajoId);
+            renderizarTareasExpandidas(trabajoId);
+            renderizarDiarioExpandido(trabajoId);
+            renderizarClientesExpandidos(trabajoId);
+            renderizarResponsabilidadesExpandidas(trabajoId);
+            renderizarRecomendacionesExpandidas(trabajoId);
+            actualizarEstadisticasExpandidas(trabajoId);
+            renderizarCuadritos();
+            
+            cerrarModalElemento();
+            mostrarNotificacion('Elemento actualizado');
+        }
+
+        function marcarTarea(trabajoId, tareaId, completada) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            const tarea = trabajo.tareas.find(t => t.id === tareaId);
+            if (tarea) {
+                tarea.completada = completada;
+                guardarTrabajosEnStorage();
+                renderizarTareasExpandidas(trabajoId);
+                actualizarEstadisticasExpandidas(trabajoId);
+                renderizarCuadritos();
+            }
+        }
+
+        function marcarTareaProyecto(trabajoId, proyectoId, tareaId, completada) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            const proyecto = trabajo.proyectos.find(p => p.id === proyectoId);
+            if (proyecto && proyecto.tareasDiarias) {
+                const tarea = proyecto.tareasDiarias.find(t => t.id === tareaId);
+                if (tarea) {
+                    tarea.completada = completada;
+                    guardarTrabajosEnStorage();
+                    renderizarProyectosExpandidos(trabajoId);
+                }
+            }
+        }
+
+        function completarRecomendacion(trabajoId, recId) {
+            const trabajo = trabajosData.find(t => t.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajo.recomendaciones = trabajo.recomendaciones.filter(r => r.id !== recId);
+            guardarTrabajosEnStorage();
+            renderizarRecomendacionesExpandidas(trabajoId);
+            mostrarNotificacion('¡Recomendación completada!');
+        }
+
+        // ===== FUNCIONES DE UTILIDAD =====
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return 'No definida';
+            const fecha = new Date(fechaStr);
+            return fecha.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function mostrarNotificacion(mensaje) {
+            const notificacion = document.createElement('div');
+            notificacion.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--excelente);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 4000;
+                animation: slideIn 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            `;
+            notificacion.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${mensaje}</span>
+            `;
+            document.body.appendChild(notificacion);
+            
+            setTimeout(() => {
+                notificacion.remove();
+            }, 3000);
+        }
+
+        // ===== MODAL DE TRABAJOS =====
+        function abrirModalCrearTrabajo() {
+            trabajoEditandoId = null;
+            document.getElementById('modalTrabajoTitle').textContent = 'Nuevo Trabajo';
+            document.getElementById('trabajoNombre').value = '';
+            document.getElementById('trabajoEmpresa').value = '';
+            document.getElementById('trabajoTipo').value = 'Tiempo Completo';
+            document.getElementById('trabajoColor').value = '#67546B';
+            actualizarFechasPorDefecto();
+            document.getElementById('modalTrabajoOverlay').classList.add('active');
+        }
+
+        function abrirModalEditarTrabajo(trabajoId) {
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            if (!trabajo) return;
+            
+            trabajoEditandoId = trabajoId;
+            document.getElementById('modalTrabajoTitle').textContent = 'Editar Trabajo';
+            document.getElementById('trabajoNombre').value = trabajo.nombre;
+            document.getElementById('trabajoEmpresa').value = trabajo.empresa;
+            document.getElementById('trabajoTipo').value = trabajo.tipo;
+            document.getElementById('trabajoColor').value = trabajo.color;
+            document.getElementById('modalTrabajoOverlay').classList.add('active');
+        }
+
+        function cerrarModalTrabajo() {
+            document.getElementById('modalTrabajoOverlay').classList.remove('active');
+            trabajoEditandoId = null;
+        }
+
+        function guardarTrabajo() {
+            const nombre = document.getElementById('trabajoNombre').value.trim();
+            const empresa = document.getElementById('trabajoEmpresa').value.trim();
+            const tipo = document.getElementById('trabajoTipo').value;
+            const color = document.getElementById('trabajoColor').value;
+            const fechaInicio = document.getElementById('trabajoFechaInicio').value;
+            
+            if (!nombre || !empresa) return;
+            
+            if (trabajoEditandoId) {
+                const trabajo = trabajosData.find(c => c.id === trabajoEditandoId);
+                if (trabajo) {
+                    trabajo.nombre = nombre;
+                    trabajo.empresa = empresa;
+                    trabajo.tipo = tipo;
+                    trabajo.color = color;
+                }
+            } else {
+                const nuevoTrabajo = {
+                    id: nextId++,
+                    nombre: nombre,
+                    empresa: empresa,
+                    fechaInicio: fechaInicio,
+                    tipo: tipo,
+                    color: color,
+                    icono: 'fa-briefcase',
+                    proyectos: [],
+                    tareas: [],
+                    diario: [],
+                    clientes: [],
+                    responsabilidades: [],
+                    recomendaciones: []
+                };
+                trabajosData.push(nuevoTrabajo);
+            }
+            
+            guardarTrabajosEnStorage();
+            renderizarCuadritos();
+            cerrarModalTrabajo();
+            mostrarNotificacion(trabajoEditandoId ? 'Trabajo actualizado' : 'Trabajo creado');
+        }
+
+        function eliminarTrabajo(trabajoId) {
+            if (!confirm('¿Estás seguro de eliminar este trabajo? Esta acción eliminará todos sus proyectos y datos asociados.')) return;
+            
+            trabajosData = trabajosData.filter(t => t.id !== trabajoId);
+            
+            guardarTrabajosEnStorage();
+            
+            if (trabajoExpandidoActual === trabajoId) {
+                cerrarTrabajo();
+            }
+            
+            renderizarCuadritos();
+            mostrarNotificacion('Trabajo eliminado');
+        }
+
+        // ===== MODAL DE ELEMENTOS =====
+        function abrirModal(tipo) {
+            if (!trabajoExpandidoActual) return;
+            
+            elementoModalConfig.tipo = tipo;
+            elementoModalConfig.trabajoId = trabajoExpandidoActual;
+            elementoModalConfig.editingId = null;
+            
+            const modal = document.getElementById('modalElementoOverlay');
+            const title = document.getElementById('modalElementoTitle');
+            const form = document.getElementById('modalElementoForm');
+            const trabajo = trabajosData.find(c => c.id === trabajoExpandidoActual);
+            
+            switch(tipo) {
+                case 'proyecto':
+                    title.textContent = `Nuevo Proyecto - ${trabajo.nombre}`;
+                    form.innerHTML = generarFormularioProyecto(trabajo);
+                    break;
+                case 'tarea':
+                    title.textContent = `Nueva Tarea - ${trabajo.nombre}`;
+                    form.innerHTML = generarFormularioTarea(trabajo);
+                    break;
+                case 'diario':
+                    title.textContent = `Registro Diario - ${trabajo.nombre}`;
+                    form.innerHTML = generarFormularioDiario(trabajo);
+                    break;
+                case 'cliente':
+                    title.textContent = `Nuevo Cliente - ${trabajo.nombre}`;
+                    form.innerHTML = generarFormularioCliente(trabajo);
+                    break;
+                case 'responsabilidad':
+                    title.textContent = `Nueva Responsabilidad - ${trabajo.nombre}`;
+                    form.innerHTML = generarFormularioResponsabilidad(trabajo);
+                    break;
+                case 'recomendacion':
+                    title.textContent = `Nueva Recomendación - ${trabajo.nombre}`;
+                    form.innerHTML = generarFormularioRecomendacion(trabajo);
+                    break;
+            }
+            
+            modal.classList.add('active');
+            
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                guardarElemento();
+            };
+        }
+
+        function generarFormularioProyecto(trabajo) {
+            const hoy = new Date().toISOString().split('T')[0];
+            return `
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Nombre del Proyecto</label>
+                    <input type="text" id="proyectoNombre" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tie"></i> Cliente</label>
+                    <input type="text" id="proyectoCliente" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Fecha Inicio</label>
+                        <input type="date" id="proyectoFechaInicio" value="${hoy}" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-check"></i> Fecha Entrega</label>
+                        <input type="date" id="proyectoFechaEntrega" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-money-bill"></i> Presupuesto ($)</label>
+                    <input type="number" id="proyectoPresupuesto" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> Estado</label>
+                    <select id="proyectoEstado">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="progreso" selected>En Progreso</option>
+                        <option value="revision">En Revisión</option>
+                        <option value="completado">Completado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percentage"></i> Progreso inicial (%)</label>
+                    <input type="number" id="proyectoProgreso" min="0" max="100" value="0">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Proyecto
+                    </button>
+                </div>
+            `;
+        }
+
+        function generarFormularioTarea(trabajo) {
+            const hoy = new Date().toISOString().split('T')[0];
+            return `
+                <div class="form-group">
+                    <label><i class="fas fa-tasks"></i> Descripción de la Tarea</label>
+                    <input type="text" id="tareaDescripcion" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Fecha</label>
+                        <input type="date" id="tareaFecha" value="${hoy}" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Horas estimadas</label>
+                        <input type="number" id="tareaHoras" min="0.5" step="0.5" value="1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-project-diagram"></i> Proyecto relacionado</label>
+                    <select id="tareaProyecto">
+                        <option value="">Sin proyecto</option>
+                        ${trabajo.proyectos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Tarea
+                    </button>
+                </div>
+            `;
+        }
+
+        function generarFormularioDiario(trabajo) {
+            const hoy = new Date().toISOString().split('T')[0];
+            return `
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Fecha</label>
+                    <input type="date" id="diarioFecha" value="${hoy}" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Horas trabajadas</label>
+                    <input type="number" id="diarioHoras" min="0.5" step="0.5" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-project-diagram"></i> Proyecto</label>
+                    <input type="text" id="diarioProyecto" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="diarioDescripcion" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tags"></i> Tags (separados por coma)</label>
+                    <input type="text" id="diarioTags" placeholder="Ej: desarrollo, reunión, diseño">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Registro
+                    </button>
+                </div>
+            `;
+        }
+
+        function generarFormularioCliente(trabajo) {
+            return `
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nombre del Cliente</label>
+                    <input type="text" id="clienteNombre" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Empresa</label>
+                    <input type="text" id="clienteEmpresa" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="clienteEmail" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Teléfono</label>
+                    <input type="text" id="clienteTelefono">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cliente
+                    </button>
+                </div>
+            `;
+        }
+
+        function generarFormularioResponsabilidad(trabajo) {
+            return `
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="respTitulo" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Área</label>
+                    <input type="text" id="respArea" placeholder="Ej: Técnica, Administrativa" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tasks"></i> Tareas (una por línea)</label>
+                    <textarea id="respTareas" rows="4" placeholder="Escribe cada tarea en una línea" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Responsabilidad
+                    </button>
+                </div>
+            `;
+        }
+
+        function generarFormularioRecomendacion(trabajo) {
+            const hoy = new Date().toISOString().split('T')[0];
+            return `
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="recTitulo" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="recDescripcion" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-flag"></i> Prioridad</label>
+                        <select id="recPrioridad">
+                            <option value="alta">Alta</option>
+                            <option value="media" selected>Media</option>
+                            <option value="baja">Baja</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Fecha</label>
+                        <input type="date" id="recFecha" value="${hoy}">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalElemento()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Recomendación
+                    </button>
+                </div>
+            `;
+        }
+
+        function guardarElemento() {
+            const tipo = elementoModalConfig.tipo;
+            const trabajoId = elementoModalConfig.trabajoId;
+            const form = document.getElementById('modalElementoForm');
+            const trabajo = trabajosData.find(c => c.id === trabajoId);
+            
+            switch(tipo) {
+                case 'proyecto':
+                    const nuevoProyecto = {
+                        id: Date.now(),
+                        nombre: form.querySelector('#proyectoNombre').value,
+                        cliente: form.querySelector('#proyectoCliente').value,
+                        fechaInicio: form.querySelector('#proyectoFechaInicio').value,
+                        fechaEntrega: form.querySelector('#proyectoFechaEntrega').value,
+                        presupuesto: parseFloat(form.querySelector('#proyectoPresupuesto').value) || 0,
+                        estado: form.querySelector('#proyectoEstado').value,
+                        progreso: parseInt(form.querySelector('#proyectoProgreso').value) || 0,
+                        tareasDiarias: []
+                    };
+                    
+                    trabajo.proyectos.push(nuevoProyecto);
+                    break;
+                    
+                case 'tarea':
+                    const nuevaTarea = {
+                        id: Date.now(),
+                        descripcion: form.querySelector('#tareaDescripcion').value,
+                        fecha: form.querySelector('#tareaFecha').value,
+                        horas: parseFloat(form.querySelector('#tareaHoras').value) || 1,
+                        proyectoId: form.querySelector('#tareaProyecto').value || null,
+                        completada: false
+                    };
+                    
+                    trabajo.tareas.push(nuevaTarea);
+                    break;
+                    
+                case 'diario':
+                    const tags = form.querySelector('#diarioTags').value
+                        .split(',')
+                        .map(t => t.trim())
+                        .filter(t => t);
+                    
+                    const nuevoDiario = {
+                        id: Date.now(),
+                        fecha: form.querySelector('#diarioFecha').value,
+                        horas: parseFloat(form.querySelector('#diarioHoras').value),
+                        proyecto: form.querySelector('#diarioProyecto').value,
+                        descripcion: form.querySelector('#diarioDescripcion').value,
+                        tags: tags
+                    };
+                    
+                    trabajo.diario.push(nuevoDiario);
+                    break;
+                    
+                case 'cliente':
+                    const nuevoCliente = {
+                        id: Date.now(),
+                        nombre: form.querySelector('#clienteNombre').value,
+                        empresa: form.querySelector('#clienteEmpresa').value,
+                        email: form.querySelector('#clienteEmail').value,
+                        telefono: form.querySelector('#clienteTelefono').value,
+                        proyectos: []
+                    };
+                    
+                    trabajo.clientes.push(nuevoCliente);
+                    break;
+                    
+                case 'responsabilidad':
+                    const tareas = form.querySelector('#respTareas').value
+                        .split('\n')
+                        .map(t => t.trim())
+                        .filter(t => t);
+                    
+                    const nuevaResp = {
+                        id: Date.now(),
+                        titulo: form.querySelector('#respTitulo').value,
+                        area: form.querySelector('#respArea').value,
+                        tareas: tareas
+                    };
+                    
+                    trabajo.responsabilidades.push(nuevaResp);
+                    break;
+                    
+                case 'recomendacion':
+                    const nuevaRec = {
+                        id: Date.now(),
+                        titulo: form.querySelector('#recTitulo').value,
+                        descripcion: form.querySelector('#recDescripcion').value,
+                        prioridad: form.querySelector('#recPrioridad').value,
+                        fecha: form.querySelector('#recFecha').value
+                    };
+                    
+                    trabajo.recomendaciones.push(nuevaRec);
+                    break;
+            }
+            
+            guardarTrabajosEnStorage();
+            
+            renderizarProyectosExpandidos(trabajoId);
+            renderizarTareasExpandidas(trabajoId);
+            renderizarDiarioExpandido(trabajoId);
+            renderizarClientesExpandidos(trabajoId);
+            renderizarResponsabilidadesExpandidas(trabajoId);
+            renderizarRecomendacionesExpandidas(trabajoId);
+            actualizarEstadisticasExpandidas(trabajoId);
+            renderizarCuadritos();
+            
+            cerrarModalElemento();
+            mostrarNotificacion('Elemento agregado');
+        }
+
+        function cerrarModalElemento() {
+            document.getElementById('modalElementoOverlay').classList.remove('active');
+            elementoModalConfig.tipo = null;
+            elementoModalConfig.trabajoId = null;
+            elementoModalConfig.editingId = null;
+        }
+
+        // ===== CONFIGURACIÓN DE EVENTOS =====
+        function configurarEventListeners() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (document.getElementById('modalTrabajoOverlay').classList.contains('active')) {
+                        cerrarModalTrabajo();
+                    } else if (document.getElementById('modalElementoOverlay').classList.contains('active')) {
+                        cerrarModalElemento();
+                    } else if (trabajoExpandidoActual) {
+                        cerrarTrabajo();
+                    }
+                }
+            });
+            
+            document.getElementById('modalTrabajoOverlay').addEventListener('click', function(e) {
+                if (e.target === this) cerrarModalTrabajo();
+            });
+            
+            document.getElementById('modalElementoOverlay').addEventListener('click', function(e) {
+                if (e.target === this) cerrarModalElemento();
+            });
+        }
+    </script>
+</body>
+</html>
