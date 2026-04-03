@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Carreras Universitarias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --lilac-fizz: #CCA1C9;
+            --cotton-candy: #FFD3DD;
+            --mauvelous: #F3A0AD;
+            --polar-sky: #BED1E3;
+            --denim: #92A1C3;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F9F9FB;
+            --bg-light: #FFF9FB;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-light: #FFFFFF;
+            --shadow: rgba(146, 161, 195, 0.15);
+            --shadow-dark: rgba(146, 161, 195, 0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F8F9FF 0%, var(--polar-sky) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .modo-cuadritos { max-width: 1400px; margin: 0 auto; }
+        .main-header {
+            background: linear-gradient(135deg, var(--denim) 0%, var(--polar-sky) 100%);
+            color: var(--text-light);
+            padding: 30px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px var(--shadow-dark);
+            position: relative;
+        }
+        .main-header h1 { font-size: 2.4rem; margin-bottom: 8px; }
+        .main-header p { font-size: 1.1rem; opacity: 0.9; }
+        .btn-crear-carrera {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,255,255,0.2); border: 2px solid white;
+            color: white; padding: 10px 22px; border-radius: 50px;
+            cursor: pointer; font-weight: 600; display: flex;
+            align-items: center; gap: 8px; transition: all 0.3s;
+        }
+        .btn-crear-carrera:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
+        .cuadritos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px; max-width: 1200px; margin: 0 auto;
+        }
+        .cuadrito-carrera {
+            background: var(--bg-primary); border-radius: 20px;
+            box-shadow: 0 8px 20px var(--shadow);
+            overflow: hidden; border: 2px solid rgba(190,209,227,0.3);
+            transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            height: 300px; display: flex; flex-direction: column;
+        }
+        .cuadrito-carrera:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 35px var(--shadow-dark); }
+        .cuadrito-header {
+            padding: 25px; text-align: center; flex: 1;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            color: white;
+        }
+        .cuadrito-logo {
+            width: 72px; height: 72px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 15px; font-size: 2.2rem; color: white;
+            background: rgba(255,255,255,0.3);
+        }
+        .cuadrito-titulo { font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
+        .cuadrito-descripcion { font-size: 0.9rem; opacity: 0.9; margin-bottom: 12px; }
+        .cuadrito-estadisticas { display: flex; justify-content: center; gap: 12px; }
+        .cuadrito-estadistica {
+            text-align: center; background: rgba(255,255,255,0.2);
+            padding: 6px 12px; border-radius: 12px;
+        }
+        .cuadrito-estadistica .valor { font-size: 1.2rem; font-weight: bold; }
+        .cuadrito-estadistica .etiqueta { font-size: 0.72rem; opacity: 0.9; }
+        .cuadrito-expandir {
+            background: rgba(0,0,0,0.05); padding: 12px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            display: flex; gap: 8px; justify-content: center;
+        }
+        .btn-expandir, .btn-editar-carrera {
+            background: rgba(255,255,255,0.9); border: none;
+            padding: 9px 18px; border-radius: 50px; font-weight: 600;
+            color: var(--text-primary); cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: center; gap: 6px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        .btn-expandir:hover, .btn-editar-carrera:hover {
+            background: white; transform: translateY(-2px);
+        }
+
+        /* ===== MODO EXPANDIDO ===== */
+        .modo-expandido {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-primary); z-index: 1000;
+            overflow-y: auto; display: none;
+            animation: expandir 0.4s ease-out;
+        }
+        .modo-expandido.active { display: block; }
+        @keyframes expandir {
+            from { opacity: 0; transform: scale(0.93); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .carrera-expandida-header {
+            color: white; padding: 25px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .carrera-info { display: flex; align-items: center; gap: 18px; }
+        .carrera-logo-expandido {
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: white;
+            background: rgba(255,255,255,0.22);
+        }
+        .carrera-titulo-expandido h2 { font-size: 2rem; margin-bottom: 4px; }
+        .carrera-titulo-expandido p { opacity: 0.9; font-size: 1rem; }
+        .btn-cerrar {
+            background: rgba(255,255,255,0.2); border: 2px solid white;
+            color: white; width: 46px; height: 46px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s; font-size: 1.2rem;
+        }
+        .btn-cerrar:hover { background: rgba(255,255,255,0.35); transform: rotate(90deg); }
+        .carrera-expandida-estadisticas {
+            display: flex; justify-content: center; gap: 30px;
+            padding: 20px; background: var(--bg-secondary); flex-wrap: wrap;
+        }
+        .estadistica-expandida { text-align: center; min-width: 120px; }
+        .estadistica-valor { font-size: 2.2rem; font-weight: bold; margin-bottom: 4px; }
+        .estadistica-etiqueta { font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .carrera-contenido { max-width: 1400px; margin: 0 auto; padding: 25px 30px; }
+        .carrera-nav {
+            background: var(--bg-secondary); padding: 16px; border-radius: 14px;
+            margin-bottom: 25px; display: flex; gap: 8px; overflow-x: auto;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+        .carrera-nav-btn {
+            padding: 10px 20px; background: transparent;
+            border: 2px solid var(--denim); color: var(--denim);
+            border-radius: 50px; cursor: pointer; font-weight: 600;
+            transition: all 0.3s; white-space: nowrap;
+            display: flex; align-items: center; gap: 7px;
+        }
+        .carrera-nav-btn:hover { background: rgba(146,161,195,0.1); transform: translateY(-1px); }
+        .carrera-nav-btn.active { background: var(--denim); color: white; box-shadow: 0 4px 12px rgba(146,161,195,0.3); }
+        .carrera-seccion { display: none; animation: fadeIn 0.4s ease-out; }
+        .carrera-seccion.active { display: block; }
+        .info-card {
+            background: var(--bg-primary); border-radius: 14px;
+            padding: 22px; box-shadow: 0 4px 18px var(--shadow);
+            border: 1px solid rgba(146,161,195,0.2); margin-bottom: 18px;
+        }
+        .card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 18px; padding-bottom: 14px;
+            border-bottom: 2px solid rgba(146,161,195,0.1);
+        }
+        .card-header h3 { font-size: 1.3rem; display: flex; align-items: center; gap: 9px; }
+        .card-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+        .action-btn {
+            padding: 8px 14px; border-radius: 18px; border: none;
+            cursor: pointer; font-weight: 500; transition: all 0.3s;
+            display: flex; align-items: center; gap: 5px; font-size: 0.88rem;
+        }
+        .btn-add { background: var(--mauvelous); color: white; }
+        .btn-edit { background: var(--polar-sky); color: white; }
+        .btn-delete { background: var(--cotton-candy); color: #b33; }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        /* MATERIAS */
+        .materias-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+        .materia-card {
+            background: var(--bg-light); border-radius: 14px;
+            padding: 18px; border-left: 5px solid; transition: all 0.3s;
+        }
+        .materia-card:hover { transform: translateX(4px); }
+        .materia-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .materia-nombre { font-weight: 600; font-size: 1.05rem; }
+        .materia-codigo { background: rgba(146,161,195,0.1); padding: 3px 10px; border-radius: 18px; font-size: 0.82rem; color: var(--denim); }
+        .materia-info { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        .info-item { display: flex; align-items: center; gap: 4px; font-size: 0.88rem; color: var(--text-secondary); }
+        .progreso-bar { height: 7px; background: rgba(146,161,195,0.2); border-radius: 4px; overflow: hidden; margin: 8px 0; }
+        .progreso-fill { height: 100%; border-radius: 4px; }
+
+        /* ===== HORARIO TABLA ===== */
+        .horario-tabla-container {
+            overflow-x: auto; border-radius: 14px;
+            box-shadow: 0 4px 18px var(--shadow);
+        }
+        .horario-tabla {
+            width: 100%; border-collapse: collapse;
+            background: white; font-size: 0.85rem; min-width: 700px;
+        }
+        .horario-tabla thead th {
+            background: linear-gradient(135deg, var(--denim) 0%, var(--polar-sky) 100%);
+            color: white; padding: 13px 8px; font-weight: 600;
+            text-align: center; border: 1px solid rgba(255,255,255,0.2);
+            position: sticky; top: 0; z-index: 2;
+        }
+        .horario-tabla thead th:first-child { min-width: 110px; }
+        .horario-tabla tbody td {
+            padding: 6px 5px; border: 1px solid rgba(146,161,195,0.25);
+            vertical-align: top; min-width: 110px; height: 68px;
+            transition: background 0.2s;
+        }
+        .horario-tabla tbody td:first-child {
+            background: rgba(146,161,195,0.08); font-weight: 600;
+            text-align: center; font-size: 0.8rem; color: var(--text-secondary);
+            vertical-align: middle;
+        }
+        .horario-tabla tbody tr:hover td:not(:first-child) { background: rgba(190,209,227,0.08); }
+
+        .celda-vacia {
+            display: flex; align-items: center; justify-content: center;
+            height: 56px; cursor: pointer; border-radius: 8px;
+            transition: all 0.2s; opacity: 0.3; color: var(--denim);
+        }
+        .celda-vacia:hover { opacity: 0.8; background: rgba(146,161,195,0.12); transform: scale(1.1); }
+
+        .clase-tabla-item {
+            color: white; padding: 5px 7px; border-radius: 7px;
+            margin: 2px 0; font-size: 0.78rem; cursor: pointer;
+            position: relative; transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+        }
+        .clase-tabla-item:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.18); }
+        .clase-tabla-item.es-recreo {
+            background: linear-gradient(135deg, #FFC107, #FFD54F) !important;
+            color: #5D4037;
+        }
+        .clase-titulo { font-weight: 600; line-height: 1.2; }
+        .clase-aula { font-size: 0.72rem; opacity: 0.85; margin-top: 1px; }
+        .clase-actions {
+            position: absolute; top: 2px; right: 2px;
+            display: none; gap: 2px;
+        }
+        .clase-tabla-item:hover .clase-actions { display: flex; }
+        .clase-btn {
+            background: rgba(255,255,255,0.3); border: none; color: white;
+            width: 18px; height: 18px; border-radius: 4px; font-size: 0.65rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .clase-btn:hover { background: rgba(255,255,255,0.55); }
+        .es-recreo .clase-btn { color: #5D4037; }
+
+        /* ===== MODALES ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.65); display: none;
+            justify-content: center; align-items: center;
+            z-index: 2000; backdrop-filter: blur(4px); padding: 20px;
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
+        .modal {
+            background: var(--bg-primary); border-radius: 20px;
+            width: 100%; max-width: 560px; max-height: 92vh;
+            overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+            border: 2px solid var(--lilac-fizz);
+            display: flex; flex-direction: column;
+        }
+        .modal-header {
+            background: linear-gradient(135deg, var(--denim) 0%, var(--polar-sky) 100%);
+            color: white; padding: 18px 22px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+        .modal-header h3 { font-size: 1.1rem; }
+        .modal-content { padding: 22px; overflow-y: auto; flex: 1; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block; margin-bottom: 6px; font-weight: 600;
+            font-size: 0.9rem; color: var(--text-primary);
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 13px;
+            border: 2px solid rgba(146,161,195,0.3); border-radius: 10px;
+            font-size: 0.95rem; font-family: inherit; transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: var(--denim);
+            box-shadow: 0 0 0 3px rgba(146,161,195,0.12);
+        }
+        .form-actions {
+            display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;
+        }
+        .btn {
+            padding: 11px 26px; border-radius: 50px; font-size: 0.95rem;
+            font-weight: 600; cursor: pointer; transition: all 0.3s;
+            border: none; display: flex; align-items: center; gap: 8px;
+            min-width: 130px; justify-content: center;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--denim) 0%, var(--polar-sky) 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(146,161,195,0.35); }
+        .btn-secondary { background: transparent; color: var(--denim); border: 2px solid var(--denim); }
+        .btn-secondary:hover { background: rgba(146,161,195,0.1); transform: translateY(-2px); }
+
+        /* SELECTOR DE DÍAS PARA MODAL HORARIO */
+        .dias-selector-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 6px; margin-bottom: 6px;
+        }
+        .dia-btn {
+            padding: 8px 4px; border: 2px solid rgba(146,161,195,0.3);
+            background: var(--bg-primary); border-radius: 10px;
+            cursor: pointer; font-size: 0.78rem; font-weight: 600;
+            text-align: center; transition: all 0.25s;
+        }
+        .dia-btn:hover { border-color: var(--denim); background: rgba(146,161,195,0.1); }
+        .dia-btn.selected { background: var(--denim); color: white; border-color: var(--denim); }
+        .dia-abr { font-size: 0.9rem; }
+        .dia-nombre { font-size: 0.65rem; opacity: 0.85; }
+
+        /* SELECTOR MATERIA EN MODAL */
+        .materias-lista-modal {
+            max-height: 200px; overflow-y: auto;
+            border: 2px solid rgba(146,161,195,0.2);
+            border-radius: 12px; padding: 10px;
+            background: var(--bg-light);
+        }
+        .materia-opcion {
+            padding: 10px 12px; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s;
+            border-bottom: 1px solid rgba(146,161,195,0.1);
+        }
+        .materia-opcion:last-child { border-bottom: none; }
+        .materia-opcion:hover { background: rgba(146,161,195,0.1); padding-left: 16px; }
+        .materia-opcion.selected {
+            background: rgba(146,161,195,0.2);
+            border-left: 4px solid var(--denim); padding-left: 14px;
+        }
+        .materia-opcion strong { font-size: 0.9rem; }
+        .materia-opcion small { color: var(--text-secondary); font-size: 0.78rem; }
+
+        .tiempo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(146,161,195,0.1); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--denim); border-radius: 3px; }
+        @media (max-width: 768px) {
+            .main-header h1 { font-size: 1.7rem; }
+            .btn-crear-carrera { position: static; margin-top: 14px; }
+            .dias-selector-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="modo-cuadritos">
+    <header class="main-header">
+        <h1><i class="fas fa-university"></i> Mis Carreras</h1>
+        <p>Selecciona una carrera para gestionar sus detalles académicos</p>
+        <button class="btn-crear-carrera" onclick="abrirModalCrearCarrera()">
+            <i class="fas fa-plus-circle"></i> Nueva Carrera
+        </button>
+    </header>
+    <div class="cuadritos-grid" id="cuadritosGrid"></div>
+</div>
+
+<!-- VISTA EXPANDIDA -->
+<div id="vistaExpandida" class="modo-expandido">
+    <div class="carrera-expandida-header" id="expandidoHeader">
+        <div class="carrera-info">
+            <div class="carrera-logo-expandido" id="expandidoLogo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="carrera-titulo-expandido">
+                <h2 id="expandidoTitulo">—</h2>
+                <p id="expandidoDescripcion">—</p>
+            </div>
+        </div>
+        <button class="btn-cerrar" onclick="cerrarCarrera()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="carrera-expandida-estadisticas">
+        <div class="estadistica-expandida">
+            <div class="estadistica-valor" id="statMaterias">0</div>
+            <div class="estadistica-etiqueta">Materias</div>
+        </div>
+        <div class="estadistica-expandida">
+            <div class="estadistica-valor" id="statPromedio">0.0</div>
+            <div class="estadistica-etiqueta">Promedio</div>
+        </div>
+        <div class="estadistica-expandida">
+            <div class="estadistica-valor" id="statClases">0</div>
+            <div class="estadistica-etiqueta">Clases/semana</div>
+        </div>
+    </div>
+
+    <div class="carrera-contenido">
+        <nav class="carrera-nav">
+            <button class="carrera-nav-btn active" data-seccion="materias"><i class="fas fa-book"></i> Materias</button>
+            <button class="carrera-nav-btn" data-seccion="horario"><i class="fas fa-calendar-week"></i> Horario</button>
+            <button class="carrera-nav-btn" data-seccion="examenes"><i class="fas fa-file-alt"></i> Exámenes</button>
+            <button class="carrera-nav-btn" data-seccion="practicas"><i class="fas fa-flask"></i> Prácticas</button>
+            <button class="carrera-nav-btn" data-seccion="metas"><i class="fas fa-bullseye"></i> Metas</button>
+        </nav>
+
+        <!-- MATERIAS -->
+        <section id="seccion-materias" class="carrera-seccion active">
+            <div class="info-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-university"></i> Materias del Semestre</h3>
+                    <div class="card-actions">
+                        <button class="action-btn btn-add" onclick="abrirModalMateria()">
+                            <i class="fas fa-plus"></i> Agregar Materia
+                        </button>
+                    </div>
+                </div>
+                <div class="materias-grid" id="materiasList"></div>
+            </div>
+        </section>
+
+        <!-- HORARIO -->
+        <section id="seccion-horario" class="carrera-seccion">
+            <div class="info-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-week"></i> Horario Semanal</h3>
+                    <div class="card-actions">
+                        <button class="action-btn btn-add" onclick="abrirModalHorario(null, null)">
+                            <i class="fas fa-plus"></i> Agregar Clase
+                        </button>
+                    </div>
+                </div>
+                <div class="horario-tabla-container" id="horarioContainer"></div>
+            </div>
+        </section>
+
+        <!-- EXAMENES -->
+        <section id="seccion-examenes" class="carrera-seccion">
+            <div class="info-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-alt"></i> Exámenes Programados</h3>
+                    <div class="card-actions">
+                        <button class="action-btn btn-add" onclick="alert('En desarrollo')">
+                            <i class="fas fa-plus"></i> Agregar Examen
+                        </button>
+                    </div>
+                </div>
+                <p style="padding:30px;text-align:center;color:var(--text-secondary);">Sección de exámenes — próximamente</p>
+            </div>
+        </section>
+
+        <!-- PRACTICAS -->
+        <section id="seccion-practicas" class="carrera-seccion">
+            <div class="info-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-flask"></i> Prácticas y Proyectos</h3>
+                </div>
+                <p style="padding:30px;text-align:center;color:var(--text-secondary);">Sección de prácticas — próximamente</p>
+            </div>
+        </section>
+
+        <!-- METAS -->
+        <section id="seccion-metas" class="carrera-seccion">
+            <div class="info-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-bullseye"></i> Metas Académicas</h3>
+                </div>
+                <p style="padding:30px;text-align:center;color:var(--text-secondary);">Sección de metas — próximamente</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- MODAL CARRERA -->
+<div class="modal-overlay" id="modalCarreraOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalCarreraTitulo">Nueva Carrera</h3>
+            <button class="action-btn btn-secondary" style="padding:6px 10px;" onclick="cerrarModalCarrera()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-content">
+            <div class="form-group">
+                <label><i class="fas fa-university"></i> Nombre de la Carrera</label>
+                <input type="text" id="carreraNombre" placeholder="Ej: Ingeniería de Software">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-school"></i> Institución</label>
+                <input type="text" id="carreraUniversidad" placeholder="Ej: Universidad Tecnológica">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-calendar"></i> Semestre / Año</label>
+                <input type="text" id="carreraSemestre" placeholder="Ej: 2024-1">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-palette"></i> Color</label>
+                <select id="carreraColor">
+                    <option value="#F3A0AD">Rosa</option>
+                    <option value="#BED1E3">Azul claro</option>
+                    <option value="#CCA1C9">Lila</option>
+                    <option value="#92A1C3">Azul oscuro</option>
+                    <option value="#FFD3DD">Rosa claro</option>
+                    <option value="#A8D8A8">Verde suave</option>
+                    <option value="#FFDAB9">Melocotón</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="cerrarModalCarrera()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarCarrera()"><i class="fas fa-save"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL MATERIA -->
+<div class="modal-overlay" id="modalMateriaOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalMateriaTitulo">Agregar Materia</h3>
+            <button class="action-btn btn-secondary" style="padding:6px 10px;" onclick="cerrarModalMateria()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-content">
+            <div class="form-group">
+                <label>Nombre de la Materia</label>
+                <input type="text" id="materiaNombre" placeholder="Ej: Matemáticas">
+            </div>
+            <div class="form-group">
+                <label>Código</label>
+                <input type="text" id="materiaCodigo" placeholder="Ej: MAT-01">
+            </div>
+            <div class="form-group">
+                <label>Profesor/a</label>
+                <input type="text" id="materiaProfesor" placeholder="Ej: Prof. García">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div class="form-group">
+                    <label>Créditos</label>
+                    <input type="number" id="materiaCreditos" min="1" max="10" value="4">
+                </div>
+                <div class="form-group">
+                    <label>Calificación (0-100)</label>
+                    <input type="number" id="materiaCalificacion" min="0" max="100" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Descripción del Horario</label>
+                <input type="text" id="materiaHorario" placeholder="Ej: Lun/Mie 7:30-8:40">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="cerrarModalMateria()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarMateria()"><i class="fas fa-save"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL HORARIO -->
+<div class="modal-overlay" id="modalHorarioOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalHorarioTitulo">Agregar Clase al Horario</h3>
+            <button class="action-btn btn-secondary" style="padding:6px 10px;" onclick="cerrarModalHorario()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-content">
+            <!-- DÍA -->
+            <div class="form-group">
+                <label><i class="fas fa-calendar-day"></i> Día de la semana</label>
+                <div class="dias-selector-grid" id="diasSelectorGrid">
+                    <!-- generado por JS -->
+                </div>
+                <input type="hidden" id="horarioDiaSeleccionado" value="0">
+            </div>
+
+            <!-- HORA -->
+            <div class="tiempo-grid">
+                <div class="form-group">
+                    <label>Hora inicio</label>
+                    <select id="horarioHoraInicio"></select>
+                </div>
+                <div class="form-group">
+                    <label>Hora fin</label>
+                    <select id="horarioHoraFin"></select>
+                </div>
+            </div>
+
+            <!-- MATERIA -->
+            <div class="form-group">
+                <label><i class="fas fa-book"></i> Materia</label>
+                <div class="materias-lista-modal" id="materiasListaModal">
+                    <!-- generado por JS -->
+                </div>
+                <input type="hidden" id="horarioMateriaId" value="">
+                <input type="hidden" id="horarioMateriaNombre" value="">
+            </div>
+
+            <!-- AULA -->
+            <div class="form-group">
+                <label>Aula / Salón (opcional)</label>
+                <input type="text" id="horarioAula" placeholder="Ej: Salón 2B">
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="cerrarModalHorario()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarClaseHorario()">
+                    <i class="fas fa-save"></i> <span id="btnGuardarHorarioLabel">Guardar Clase</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== ESTADO GLOBAL =====
+let carreras = [];
+let nextId = 1;
+let carreraActual = null;   // id de la carrera expandida
+let editandoClaseId = null; // null = nueva, número = editando
+let editandoMateriaIndex = null;
+let editandoCarreraId = null;
+
+const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const DIAS_ABR = ['LUN','MAR','MIÉ','JUE','VIE','SÁB','DOM'];
+
+// Horas disponibles
+const HORAS = [];
+for (let h = 7; h <= 20; h++) {
+    HORAS.push(`${h}:00`);
+    HORAS.push(`${h}:30`);
+}
+HORAS.push('21:00');
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+    cargarStorage();
+    if (carreras.length === 0) cargarEjemplo();
+    renderCuadritos();
+    construirDiasSelector();
+    rellenarSelectoresHora();
+    configurarNav();
+    configurarTeclado();
+});
+
+// ===== STORAGE =====
+function cargarStorage() {
+    try {
+        const d = localStorage.getItem('carrerasV2');
+        if (d) {
+            const parsed = JSON.parse(d);
+            carreras = parsed.carreras || [];
+            nextId = parsed.nextId || (carreras.length ? Math.max(...carreras.map(c=>c.id))+1 : 1);
+        }
+    } catch(e) { carreras = []; }
+}
+function guardarStorage() {
+    localStorage.setItem('carrerasV2', JSON.stringify({ carreras, nextId }));
+}
+
+// ===== EJEMPLO =====
+function cargarEjemplo() {
+    carreras = [{
+        id: 1,
+        nombre: 'Segundo Primaria Sección B',
+        universidad: 'Colegio',
+        semestre: '2024',
+        color: '#F3A0AD',
+        icono: 'fa-child',
+        materias: [
+            { id:101, nombre:'Matemática', codigo:'MAT-01', profesor:'Prof. García', creditos:4, horario:'Lun/Mie 7:30-8:40', calificacion:85 },
+            { id:102, nombre:'Comunicación', codigo:'COM-01', profesor:'Prof. López', creditos:4, horario:'Mar/Jue 7:30-8:40', calificacion:90 },
+            { id:103, nombre:'Medio Natural', codigo:'NAT-01', profesor:'Prof. Martínez', creditos:3, horario:'Lun/Mie 8:40-9:50', calificacion:88 },
+            { id:104, nombre:'Medio Social', codigo:'SOC-01', profesor:'Prof. Pérez', creditos:3, horario:'Mar/Jue 8:40-9:50', calificacion:87 }
+        ],
+        horario: [
+            { id:1,  dia:0, horaInicio:'7:30',  horaFin:'8:05',  materiaId:101, materiaNombre:'Matemática',         aula:'' },
+            { id:2,  dia:0, horaInicio:'8:05',  horaFin:'8:40',  materiaId:102, materiaNombre:'Comunicación',       aula:'' },
+            { id:3,  dia:0, horaInicio:'8:40',  horaFin:'9:15',  materiaId:103, materiaNombre:'Medio Natural',      aula:'' },
+            { id:4,  dia:0, horaInicio:'9:15',  horaFin:'9:50',  materiaId:104, materiaNombre:'Formación Ciudadana',aula:'' },
+            { id:5,  dia:0, horaInicio:'9:50',  horaFin:'10:20', materiaId:999, materiaNombre:'RECREO',             aula:'' },
+            { id:6,  dia:0, horaInicio:'10:20', horaFin:'10:55', materiaId:104, materiaNombre:'Medio Social',       aula:'' },
+            { id:10, dia:1, horaInicio:'7:30',  horaFin:'8:05',  materiaId:102, materiaNombre:'Comunicación',       aula:'' },
+            { id:11, dia:1, horaInicio:'8:05',  horaFin:'8:40',  materiaId:101, materiaNombre:'Matemática',         aula:'' },
+            { id:12, dia:1, horaInicio:'8:40',  horaFin:'9:15',  materiaId:104, materiaNombre:'Medio Social',       aula:'' },
+            { id:14, dia:1, horaInicio:'9:50',  horaFin:'10:20', materiaId:999, materiaNombre:'RECREO',             aula:'' },
+            { id:20, dia:4, horaInicio:'7:30',  horaFin:'8:05',  materiaId:101, materiaNombre:'Matemática',         aula:'' },
+            { id:21, dia:4, horaInicio:'8:05',  horaFin:'8:40',  materiaId:102, materiaNombre:'Comunicación',       aula:'' },
+            { id:22, dia:4, horaInicio:'9:50',  horaFin:'10:20', materiaId:999, materiaNombre:'RECREO',             aula:'' },
+            { id:30, dia:5, horaInicio:'7:30',  horaFin:'8:05',  materiaId:105, materiaNombre:'Actividades',        aula:'' }
+        ]
+    }];
+    nextId = 2;
+    guardarStorage();
+}
+
+// ===== RENDER CUADRITOS =====
+function renderCuadritos() {
+    const grid = document.getElementById('cuadritosGrid');
+    grid.innerHTML = '';
+    carreras.forEach(c => {
+        const prom = c.materias.length
+            ? (c.materias.reduce((a,m)=>a+(m.calificacion||0),0)/c.materias.length).toFixed(1)
+            : '0.0';
+        const div = document.createElement('div');
+        div.className = 'cuadrito-carrera';
+        div.innerHTML = `
+            <div class="cuadrito-header" style="background:${c.color}">
+                <div class="cuadrito-logo"><i class="fas ${c.icono||'fa-graduation-cap'}"></i></div>
+                <h3 class="cuadrito-titulo">${c.nombre}</h3>
+                <p class="cuadrito-descripcion">${c.universidad} · ${c.semestre}</p>
+                <div class="cuadrito-estadisticas">
+                    <div class="cuadrito-estadistica">
+                        <div class="valor">${c.materias.length}</div>
+                        <div class="etiqueta">Materias</div>
+                    </div>
+                    <div class="cuadrito-estadistica">
+                        <div class="valor">${prom}</div>
+                        <div class="etiqueta">Promedio</div>
+                    </div>
+                    <div class="cuadrito-estadistica">
+                        <div class="valor">${c.horario.length}</div>
+                        <div class="etiqueta">Clases</div>
+                    </div>
+                </div>
+            </div>
+            <div class="cuadrito-expandir">
+                <button class="btn-expandir" onclick="abrirCarrera(${c.id})">
+                    <i class="fas fa-expand-alt"></i> Ver Detalles
+                </button>
+                <button class="btn-editar-carrera" onclick="abrirModalEditarCarrera(${c.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>`;
+        grid.appendChild(div);
+    });
+}
+
+// ===== ABRIR / CERRAR CARRERA =====
+function abrirCarrera(id) {
+    carreraActual = id;
+    const c = carreras.find(x=>x.id===id);
+    if (!c) return;
+    document.getElementById('expandidoHeader').style.background = `linear-gradient(135deg, ${c.color} 0%, ${c.color}cc 100%)`;
+    document.getElementById('expandidoLogo').innerHTML = `<i class="fas ${c.icono||'fa-graduation-cap'}"></i>`;
+    document.getElementById('expandidoTitulo').textContent = c.nombre;
+    document.getElementById('expandidoDescripcion').textContent = `${c.universidad} · ${c.semestre}`;
+    // Activar pestaña materias por defecto
+    document.querySelectorAll('.carrera-nav-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelector('[data-seccion="materias"]').classList.add('active');
+    document.querySelectorAll('.carrera-seccion').forEach(s=>s.classList.remove('active'));
+    document.getElementById('seccion-materias').classList.add('active');
+    actualizarStats();
+    renderMaterias();
+    renderHorario();
+    document.getElementById('vistaExpandida').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarCarrera() {
+    document.getElementById('vistaExpandida').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    carreraActual = null;
+}
+
+// ===== STATS =====
+function actualizarStats() {
+    const c = carreras.find(x=>x.id===carreraActual);
+    if (!c) return;
+    const prom = c.materias.length
+        ? (c.materias.reduce((a,m)=>a+(m.calificacion||0),0)/c.materias.length).toFixed(1)
+        : '0.0';
+    document.getElementById('statMaterias').textContent = c.materias.length;
+    document.getElementById('statPromedio').textContent = prom;
+    document.getElementById('statClases').textContent = c.horario.length;
+}
+
+// ===== RENDER MATERIAS =====
+function renderMaterias() {
+    const c = carreras.find(x=>x.id===carreraActual);
+    const container = document.getElementById('materiasList');
+    if (!c) return;
+    if (!c.materias.length) {
+        container.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-secondary);">Sin materias aún. Agrega una!</p>';
+        return;
+    }
+    container.innerHTML = c.materias.map((m,i) => `
+        <div class="materia-card" style="border-left-color:${c.color}">
+            <div class="materia-header">
+                <div class="materia-nombre">${m.nombre}</div>
+                <div class="materia-codigo">${m.codigo}</div>
+            </div>
+            <div class="materia-info">
+                <div class="info-item"><i class="fas fa-user-graduate"></i> ${m.profesor}</div>
+                <div class="info-item"><i class="fas fa-clock"></i> ${m.horario}</div>
+                <div class="info-item"><i class="fas fa-star"></i> ${m.creditos} cred.</div>
+            </div>
+            <div class="progreso-bar">
+                <div class="progreso-fill" style="width:${m.calificacion}%;background:${c.color}"></div>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:10px;">Calificación: <strong>${m.calificacion}</strong>/100</div>
+            <div class="card-actions" style="margin-top:10px;">
+                <button class="action-btn btn-edit" onclick="abrirModalEditarMateria(${i})"><i class="fas fa-edit"></i> Editar</button>
+                <button class="action-btn btn-delete" onclick="eliminarMateria(${i})"><i class="fas fa-trash"></i> Eliminar</button>
+            </div>
+        </div>`).join('');
+}
+
+// ===== RENDER HORARIO =====
+function renderHorario() {
+    const c = carreras.find(x=>x.id===carreraActual);
+    const container = document.getElementById('horarioContainer');
+    if (!c) return;
+
+    // Determinar qué días y horas tienen datos
+    const diasConDatos = new Set(c.horario.map(h=>h.dia));
+    // Siempre mostrar Lun-Dom pero resaltar los que tienen datos
+    const todasLasHorasSet = new Set();
+    c.horario.forEach(h => {
+        todasLasHorasSet.add(h.horaInicio);
+    });
+
+    // Construir rango de horas: desde la mínima hasta la máxima
+    let horasOrdenadas = [...todasLasHorasSet].sort((a,b)=>horaMin(a)-horaMin(b));
+    if (horasOrdenadas.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center;padding:40px;color:var(--text-secondary);">
+                <i class="fas fa-calendar-plus" style="font-size:2.5rem;margin-bottom:12px;display:block;opacity:0.4;"></i>
+                No hay clases en el horario aún.<br>
+                <button class="action-btn btn-add" style="margin-top:16px;display:inline-flex;" onclick="abrirModalHorario(null,null)">
+                    <i class="fas fa-plus"></i> Agregar primera clase
+                </button>
+            </div>`;
+        return;
+    }
+
+    // Expandir horas para incluir todas las ranuras entre min y max
+    const minH = horaMin(horasOrdenadas[0]);
+    const maxH = horaMin(horasOrdenadas[horasOrdenadas.length-1]) + 35; // +35min para mostrar última
+    const horasTabla = HORAS.filter(h => horaMin(h) >= minH && horaMin(h) < maxH);
+
+    let html = '<table class="horario-tabla"><thead><tr>';
+    html += '<th>Hora</th>';
+    for (let d=0; d<7; d++) {
+        const tieneDatos = diasConDatos.has(d);
+        html += `<th style="${tieneDatos?'':'opacity:0.5'}">${DIAS_ABR[d]}<br><small style="font-weight:400;font-size:0.7rem;">${DIAS[d]}</small></th>`;
+    }
+    html += '</tr></thead><tbody>';
+
+    horasTabla.forEach(hora => {
+        html += `<tr><td>${hora}</td>`;
+        for (let d=0; d<7; d++) {
+            const clases = c.horario.filter(cl => cl.dia===d && cl.horaInicio===hora);
+            html += '<td>';
+            if (clases.length > 0) {
+                clases.forEach(cl => {
+                    const esRecreo = cl.materiaNombre==='RECREO';
+                    const bg = esRecreo ? '' : `background:${c.color};`;
+                    html += `
+                        <div class="clase-tabla-item ${esRecreo?'es-recreo':''}" style="${bg}"
+                             onclick="event.stopPropagation()">
+                            <div class="clase-titulo">${cl.materiaNombre}</div>
+                            ${cl.horaFin ? `<div class="clase-aula">${cl.horaInicio}–${cl.horaFin}</div>` : ''}
+                            ${cl.aula ? `<div class="clase-aula"><i class="fas fa-door-open"></i> ${cl.aula}</div>` : ''}
+                            <div class="clase-actions">
+                                <button class="clase-btn" title="Editar" onclick="event.stopPropagation();abrirModalEditarClase(${cl.id})"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="clase-btn" title="Eliminar" onclick="event.stopPropagation();eliminarClase(${cl.id})"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>`;
+                });
+            } else {
+                html += `<div class="celda-vacia" onclick="abrirModalHorario(${d},'${hora}')">
+                    <i class="fas fa-plus-circle" style="font-size:1.1rem;"></i>
+                </div>`;
+            }
+            html += '</td>';
+        }
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function horaMin(h) {
+    if (!h) return 0;
+    const [hh,mm] = h.split(':').map(Number);
+    return hh*60+(mm||0);
+}
+
+// ===== MODAL HORARIO =====
+function construirDiasSelector() {
+    const grid = document.getElementById('diasSelectorGrid');
+    grid.innerHTML = DIAS.map((d,i)=>`
+        <div class="dia-btn" id="diaBtn${i}" data-dia="${i}" onclick="seleccionarDia(${i})">
+            <div class="dia-abr">${DIAS_ABR[i]}</div>
+            <div class="dia-nombre">${d}</div>
+        </div>`).join('');
+}
+
+function seleccionarDia(idx) {
+    document.querySelectorAll('.dia-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById(`diaBtn${idx}`).classList.add('selected');
+    document.getElementById('horarioDiaSeleccionado').value = idx;
+}
+
+function rellenarSelectoresHora() {
+    const optsInicio = HORAS.map(h=>`<option value="${h}">${h}</option>`).join('');
+    const optsFin    = HORAS.map(h=>`<option value="${h}">${h}</option>`).join('');
+    document.getElementById('horarioHoraInicio').innerHTML = optsInicio;
+    document.getElementById('horarioHoraFin').innerHTML    = optsFin;
+    // Al cambiar hora inicio, ajustar hora fin
+    document.getElementById('horarioHoraInicio').addEventListener('change', function(){
+        const idx = HORAS.indexOf(this.value);
+        const finSel = document.getElementById('horarioHoraFin');
+        if (idx >= 0 && idx < HORAS.length-1) {
+            finSel.value = HORAS[idx+1];
+        }
+    });
+}
+
+function poblarMateriasModal() {
+    const c = carreras.find(x=>x.id===carreraActual);
+    const lista = document.getElementById('materiasListaModal');
+    let html = `<div class="materia-opcion" data-id="999" data-nombre="RECREO" onclick="seleccionarMateriaModal(this,999,'RECREO')">
+        <strong>🟡 RECREO</strong><br><small>Descanso / Recreo</small>
+    </div>`;
+    if (c && c.materias.length) {
+        html += c.materias.map(m=>`
+            <div class="materia-opcion" data-id="${m.id}" data-nombre="${m.nombre}"
+                 onclick="seleccionarMateriaModal(this,${m.id},'${m.nombre.replace(/'/g,"\\'")}')">
+                <strong>${m.nombre}</strong><br><small>${m.profesor} · ${m.codigo}</small>
+            </div>`).join('');
+    } else {
+        html += '<p style="color:var(--text-secondary);font-size:0.85rem;padding:8px;">Sin materias registradas aún</p>';
+    }
+    lista.innerHTML = html;
+}
+
+function seleccionarMateriaModal(el, id, nombre) {
+    document.querySelectorAll('.materia-opcion').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('horarioMateriaId').value = id;
+    document.getElementById('horarioMateriaNombre').value = nombre;
+}
+
+function abrirModalHorario(diaPredet, horaPredet) {
+    editandoClaseId = null;
+    document.getElementById('modalHorarioTitulo').textContent = 'Agregar Clase al Horario';
+    document.getElementById('btnGuardarHorarioLabel').textContent = 'Guardar Clase';
+    // Limpiar selección
+    document.querySelectorAll('.dia-btn').forEach(b=>b.classList.remove('selected'));
+    const diaIdx = (diaPredet !== null && diaPredet !== undefined) ? diaPredet : 0;
+    document.getElementById(`diaBtn${diaIdx}`).classList.add('selected');
+    document.getElementById('horarioDiaSeleccionado').value = diaIdx;
+    // Hora inicio
+    const hInicio = horaPredet || '7:30';
+    document.getElementById('horarioHoraInicio').value = hInicio;
+    // Hora fin: siguiente
+    const idxH = HORAS.indexOf(hInicio);
+    document.getElementById('horarioHoraFin').value = idxH >= 0 && idxH < HORAS.length-1 ? HORAS[idxH+1] : hInicio;
+    // Materia
+    document.getElementById('horarioMateriaId').value = '';
+    document.getElementById('horarioMateriaNombre').value = '';
+    document.getElementById('horarioAula').value = '';
+    poblarMateriasModal();
+    document.getElementById('modalHorarioOverlay').classList.add('active');
+}
+
+function abrirModalEditarClase(claseId) {
+    const c = carreras.find(x=>x.id===carreraActual);
+    if (!c) return;
+    const cl = c.horario.find(h=>h.id===claseId);
+    if (!cl) return;
+    editandoClaseId = claseId;
+    document.getElementById('modalHorarioTitulo').textContent = 'Editar Clase';
+    document.getElementById('btnGuardarHorarioLabel').textContent = 'Actualizar Clase';
+    // Día
+    document.querySelectorAll('.dia-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById(`diaBtn${cl.dia}`).classList.add('selected');
+    document.getElementById('horarioDiaSeleccionado').value = cl.dia;
+    // Horas
+    document.getElementById('horarioHoraInicio').value = cl.horaInicio;
+    document.getElementById('horarioHoraFin').value = cl.horaFin || cl.horaInicio;
+    // Materia
+    document.getElementById('horarioMateriaId').value = cl.materiaId;
+    document.getElementById('horarioMateriaNombre').value = cl.materiaNombre;
+    document.getElementById('horarioAula').value = cl.aula || '';
+    poblarMateriasModal();
+    // Marcar materia
+    setTimeout(()=>{
+        const opt = document.querySelector(`.materia-opcion[data-id="${cl.materiaId}"]`);
+        if (opt) opt.classList.add('selected');
+    }, 30);
+    document.getElementById('modalHorarioOverlay').classList.add('active');
+}
+
+function cerrarModalHorario() {
+    document.getElementById('modalHorarioOverlay').classList.remove('active');
+    editandoClaseId = null;
+}
+
+function guardarClaseHorario() {
+    const dia        = parseInt(document.getElementById('horarioDiaSeleccionado').value);
+    const horaInicio = document.getElementById('horarioHoraInicio').value;
+    const horaFin    = document.getElementById('horarioHoraFin').value;
+    const matId      = parseInt(document.getElementById('horarioMateriaId').value);
+    const matNombre  = document.getElementById('horarioMateriaNombre').value.trim();
+    const aula       = document.getElementById('horarioAula').value.trim();
+
+    if (isNaN(dia) || dia < 0 || dia > 6) { alert('Selecciona un día de la semana.'); return; }
+    if (!horaInicio || !horaFin)           { alert('Selecciona las horas de inicio y fin.'); return; }
+    if (horaMin(horaInicio) >= horaMin(horaFin)) { alert('La hora de inicio debe ser antes de la hora de fin.'); return; }
+    if (!matNombre)                         { alert('Selecciona una materia de la lista.'); return; }
+    if (isNaN(matId))                       { alert('Selecciona una materia de la lista.'); return; }
+
+    const c = carreras.find(x=>x.id===carreraActual);
+    if (!c) return;
+
+    // Verificar conflicto
+    const conflicto = c.horario.some(cl => {
+        if (editandoClaseId && cl.id === editandoClaseId) return false;
+        if (cl.dia !== dia) return false;
+        // Solapamiento
+        return horaMin(cl.horaInicio) < horaMin(horaFin) && horaMin(cl.horaFin || cl.horaInicio) > horaMin(horaInicio);
+    });
+    if (conflicto) { alert('Ya existe una clase que se solapa en ese horario para este día.'); return; }
+
+    if (editandoClaseId !== null) {
+        const idx = c.horario.findIndex(cl=>cl.id===editandoClaseId);
+        if (idx !== -1) {
+            c.horario[idx] = { ...c.horario[idx], dia, horaInicio, horaFin, materiaId:matId, materiaNombre:matNombre, aula };
+        }
+    } else {
+        c.horario.push({
+            id: Date.now() + Math.floor(Math.random()*1000),
+            dia, horaInicio, horaFin, materiaId:matId, materiaNombre:matNombre, aula
+        });
+    }
+
+    // Ordenar
+    c.horario.sort((a,b) => a.dia !== b.dia ? a.dia - b.dia : horaMin(a.horaInicio) - horaMin(b.horaInicio));
+
+    guardarStorage();
+    cerrarModalHorario();
+    actualizarStats();
+    renderHorario();
+    renderCuadritos();
+}
+
+function eliminarClase(id) {
+    if (!confirm('¿Eliminar esta clase del horario?')) return;
+    const c = carreras.find(x=>x.id===carreraActual);
+    if (!c) return;
+    c.horario = c.horario.filter(cl=>cl.id!==id);
+    guardarStorage();
+    actualizarStats();
+    renderHorario();
+    renderCuadritos();
+}
+
+// ===== MODAL MATERIA =====
+function abrirModalMateria() {
+    editandoMateriaIndex = null;
+    document.getElementById('modalMateriaTitulo').textContent = 'Agregar Materia';
+    document.getElementById('materiaNombre').value = '';
+    document.getElementById('materiaCodigo').value = '';
+    document.getElementById('materiaProfesor').value = '';
+    document.getElementById('materiaCreditos').value = '4';
+    document.getElementById('materiaCalificacion').value = '0';
+    document.getElementById('materiaHorario').value = '';
+    document.getElementById('modalMateriaOverlay').classList.add('active');
+}
+function abrirModalEditarMateria(idx) {
+    const c = carreras.find(x=>x.id===carreraActual);
+    if (!c) return;
+    const m = c.materias[idx];
+    editandoMateriaIndex = idx;
+    document.getElementById('modalMateriaTitulo').textContent = 'Editar Materia';
+    document.getElementById('materiaNombre').value = m.nombre;
+    document.getElementById('materiaCodigo').value = m.codigo;
+    document.getElementById('materiaProfesor').value = m.profesor;
+    document.getElementById('materiaCreditos').value = m.creditos;
+    document.getElementById('materiaCalificacion').value = m.calificacion;
+    document.getElementById('materiaHorario').value = m.horario;
+    document.getElementById('modalMateriaOverlay').classList.add('active');
+}
+function cerrarModalMateria() {
+    document.getElementById('modalMateriaOverlay').classList.remove('active');
+}
+function guardarMateria() {
+    const nombre = document.getElementById('materiaNombre').value.trim();
+    const codigo = document.getElementById('materiaCodigo').value.trim();
+    const profesor = document.getElementById('materiaProfesor').value.trim();
+    const creditos = parseInt(document.getElementById('materiaCreditos').value) || 4;
+    const calificacion = parseInt(document.getElementById('materiaCalificacion').value) || 0;
+    const horario = document.getElementById('materiaHorario').value.trim();
+    if (!nombre || !codigo || !profesor) { alert('Completa nombre, código y profesor.'); return; }
+    const c = carreras.find(x=>x.id===carreraActual);
+    if (!c) return;
+    const materia = { id: Date.now(), nombre, codigo, profesor, creditos, calificacion, horario };
+    if (editandoMateriaIndex !== null) {
+        materia.id = c.materias[editandoMateriaIndex].id;
+        c.materias[editandoMateriaIndex] = materia;
+    } else {
+        c.materias.push(materia);
+    }
+    guardarStorage();
+    cerrarModalMateria();
+    actualizarStats();
+    renderMaterias();
+    renderHorario(); // reconstruir selector materias en horario
+    renderCuadritos();
+}
+function eliminarMateria(idx) {
+    if (!confirm('¿Eliminar esta materia?')) return;
+    const c = carreras.find(x=>x.id===carreraActual);
+    c.materias.splice(idx,1);
+    guardarStorage();
+    actualizarStats();
+    renderMaterias();
+    renderCuadritos();
+}
+
+// ===== MODAL CARRERA =====
+function abrirModalCrearCarrera() {
+    editandoCarreraId = null;
+    document.getElementById('modalCarreraTitulo').textContent = 'Nueva Carrera';
+    document.getElementById('carreraNombre').value = '';
+    document.getElementById('carreraUniversidad').value = '';
+    document.getElementById('carreraSemestre').value = '';
+    document.getElementById('carreraColor').value = '#F3A0AD';
+    document.getElementById('modalCarreraOverlay').classList.add('active');
+}
+function abrirModalEditarCarrera(id) {
+    const c = carreras.find(x=>x.id===id);
+    if (!c) return;
+    editandoCarreraId = id;
+    document.getElementById('modalCarreraTitulo').textContent = 'Editar Carrera';
+    document.getElementById('carreraNombre').value = c.nombre;
+    document.getElementById('carreraUniversidad').value = c.universidad;
+    document.getElementById('carreraSemestre').value = c.semestre;
+    document.getElementById('carreraColor').value = c.color;
+    document.getElementById('modalCarreraOverlay').classList.add('active');
+}
+function cerrarModalCarrera() {
+    document.getElementById('modalCarreraOverlay').classList.remove('active');
+}
+function guardarCarrera() {
+    const nombre = document.getElementById('carreraNombre').value.trim();
+    const universidad = document.getElementById('carreraUniversidad').value.trim();
+    const semestre = document.getElementById('carreraSemestre').value.trim();
+    const color = document.getElementById('carreraColor').value;
+    if (!nombre || !universidad || !semestre) { alert('Completa todos los campos.'); return; }
+    if (editandoCarreraId) {
+        const c = carreras.find(x=>x.id===editandoCarreraId);
+        if (c) { c.nombre=nombre; c.universidad=universidad; c.semestre=semestre; c.color=color; }
+    } else {
+        carreras.push({ id:nextId++, nombre, universidad, semestre, color,
+            icono:'fa-graduation-cap', materias:[], horario:[] });
+    }
+    guardarStorage();
+    renderCuadritos();
+    cerrarModalCarrera();
+}
+
+// ===== NAV TABS =====
+function configurarNav() {
+    document.querySelectorAll('.carrera-nav-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.carrera-nav-btn').forEach(b=>b.classList.remove('active'));
+            this.classList.add('active');
+            const sec = this.dataset.seccion;
+            document.querySelectorAll('.carrera-seccion').forEach(s=>s.classList.remove('active'));
+            document.getElementById(`seccion-${sec}`).classList.add('active');
+            if (sec==='horario') renderHorario();
+        });
+    });
+}
+
+// ===== TECLADO =====
+function configurarTeclado() {
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        if (document.getElementById('modalHorarioOverlay').classList.contains('active')) cerrarModalHorario();
+        else if (document.getElementById('modalMateriaOverlay').classList.contains('active')) cerrarModalMateria();
+        else if (document.getElementById('modalCarreraOverlay').classList.contains('active')) cerrarModalCarrera();
+        else if (carreraActual) cerrarCarrera();
+    });
+    ['modalCarreraOverlay','modalMateriaOverlay','modalHorarioOverlay'].forEach(id => {
+        document.getElementById(id).addEventListener('click', function(e){
+            if (e.target===this) this.classList.remove('active');
+        });
+    });
+}
+</script>
+</body>
+</html>

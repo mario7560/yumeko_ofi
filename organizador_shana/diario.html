@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diario Personal de Shana</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #877499 0%, #679F9F 100%);
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #2D4729 0%, #877499 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Pantalla de login */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #877499 0%, #679F9F 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: all 0.5s;
+        }
+
+        .login-card {
+            background: #dca6db;
+            border-radius: 30px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+            border: 2px solid #E18299;
+        }
+
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #877499;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-card .input-group {
+            margin-bottom: 20px;
+        }
+
+        .login-card .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #679F9F;
+        }
+
+        .login-card .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E18299;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .login-card .input-group input:focus {
+            outline: none;
+            border-color: #877499;
+            box-shadow: 0 0 0 3px rgba(135,116,153,0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #E18299, #877499);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(225,130,153,0.4);
+            background: linear-gradient(135deg, #c96e85, #6a5a7e);
+        }
+
+        .login-error {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        /* Header del diario */
+        .diary-header {
+            background: #E6D4BF;
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #E18299;
+        }
+
+        body.dark-mode .diary-header {
+            background: #2D4729;
+            color: white;
+        }
+
+        .diary-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #877499;
+        }
+
+        body.dark-mode .diary-header h1 {
+            color: #E6D4BF;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-logout {
+            background: #E18299;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #c96e85;
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle {
+            background: #679F9F;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: #528080;
+            transform: translateY(-2px);
+        }
+
+        /* Selector de emociones */
+        .emotion-selector {
+            background: #E6D4BF;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #E18299;
+        }
+
+        body.dark-mode .emotion-selector {
+            background: #2D4729;
+        }
+
+        .emotion-selector h3 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #877499;
+        }
+
+        body.dark-mode .emotion-selector h3 {
+            color: #E6D4BF;
+        }
+
+        .emotions-grid {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .emotion-btn {
+            padding: 12px 20px;
+            border: 2px solid #E18299;
+            border-radius: 50px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        body.dark-mode .emotion-btn {
+            background: #E6D4BF;
+            color: #333;
+            border-color: #877499;
+        }
+
+        .emotion-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .emotion-btn.selected {
+            border-color: #877499;
+            background: #877499;
+            color: white;
+        }
+
+        /* Formulario de entrada */
+        .entry-form {
+            background: #E6D4BF;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #E18299;
+        }
+
+        body.dark-mode .entry-form {
+            background: #2D4729;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #877499;
+        }
+
+        body.dark-mode .form-group label {
+            color: #E6D4BF;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E18299;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group textarea {
+            background: #E6D4BF;
+            border-color: #877499;
+            color: #333;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #877499;
+            box-shadow: 0 0 0 3px rgba(135,116,153,0.2);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #E18299, #877499);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(225,130,153,0.4);
+        }
+
+        .btn-secondary {
+            background: #679F9F;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #528080;
+            transform: translateY(-2px);
+        }
+
+        /* Estadísticas de emociones */
+        .stats-emotions {
+            background: #E6D4BF;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #E18299;
+        }
+
+        body.dark-mode .stats-emotions {
+            background: #2D4729;
+        }
+
+        .stats-emotions h3 {
+            color: #877499;
+            margin-bottom: 15px;
+        }
+
+        body.dark-mode .stats-emotions h3 {
+            color: #E6D4BF;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-emotion {
+            text-align: center;
+            padding: 10px;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid #E18299;
+        }
+
+        body.dark-mode .stat-emotion {
+            background: #E6D4BF;
+        }
+
+        /* Lista de entradas */
+        .entries-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .entry-card {
+            background: #E6D4BF;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-left: 5px solid #E18299;
+            border-right: 2px solid #E18299;
+            border-top: 2px solid #E18299;
+            border-bottom: 2px solid #E18299;
+        }
+
+        body.dark-mode .entry-card {
+            background: #2D4729;
+            color: white;
+        }
+
+        .entry-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #E18299;
+        }
+
+        .entry-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #679F9F;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .entry-date {
+            color: #E6D4BF;
+        }
+
+        .entry-emotion {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 50px;
+            background: white;
+            font-size: 0.9rem;
+            border: 1px solid #E18299;
+        }
+
+        body.dark-mode .entry-emotion {
+            background: #E6D4BF;
+            color: #333;
+        }
+
+        .entry-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #877499;
+        }
+
+        body.dark-mode .entry-title {
+            color: #E6D4BF;
+        }
+
+        .entry-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+
+        body.dark-mode .entry-content {
+            color: #d4c5b0;
+        }
+
+        .entry-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-icon {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #679F9F;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #528080;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #E18299;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c96e85;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background: #E6D4BF;
+            border-radius: 20px;
+            border: 2px solid #E18299;
+        }
+
+        body.dark-mode .empty-state {
+            background: #2D4729;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .diary-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .emotions-grid {
+                justify-content: center;
+            }
+        }
+</style>
+</head>
+<body>
+    <!-- Pantalla de Login -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <h2><i class="fas fa-heart" style="color: #A67CA4;"></i> Diario de Shana</h2>
+            <div class="input-group">
+                <label><i class="fas fa-user"></i> Usuario</label>
+                <input type="text" id="loginUser" placeholder="Ingresa tu usuario" value="shana">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-key"></i> Contraseña</label>
+                <input type="password" id="loginPass" placeholder="Ingresa tu contraseña">
+            </div>
+            <button class="btn-login" onclick="login()">
+                <i class="fas fa-unlock-alt"></i> Entrar a mi diario
+            </button>
+            <div class="login-error" id="loginError"></div>
+            <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #6A8CA9;">
+                <i class="fas fa-lock"></i> Tu espacio personal y seguro
+            </p>
+        </div>
+    </div>
+
+    <!-- Contenido del Diario (oculto hasta login) -->
+    <div class="container" id="diaryContent" style="display: none;">
+        <div class="diary-header">
+            <h1><i class="fas fa-book-open"></i> Mi Diario Personal</h1>
+            <div class="user-info">
+                <span><i class="fas fa-user-circle"></i> <span id="currentUser">Shana</span></span>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+        </div>
+
+        <!-- Selector de Emociones -->
+        <div class="emotion-selector">
+            <h3><i class="fas fa-smile-wink"></i> ¿Cómo te sientes hoy?</h3>
+            <div class="emotions-grid" id="emotionsGrid">
+                <button class="emotion-btn" data-emotion="😊 Feliz" onclick="selectEmotion('😊 Feliz')">
+                    <i class="fas fa-smile"></i> 😊 Feliz
+                </button>
+                <button class="emotion-btn" data-emotion="😢 Triste" onclick="selectEmotion('😢 Triste')">
+                    <i class="fas fa-frown"></i> 😢 Triste
+                </button>
+                <button class="emotion-btn" data-emotion="😠 Enojada" onclick="selectEmotion('😠 Enojada')">
+                    <i class="fas fa-angry"></i> 😠 Enojada
+                </button>
+                <button class="emotion-btn" data-emotion="😍 Enamorada" onclick="selectEmotion('😍 Enamorada')">
+                    <i class="fas fa-heart"></i> 😍 Enamorada
+                </button>
+                <button class="emotion-btn" data-emotion="😎 Genial" onclick="selectEmotion('😎 Genial')">
+                    <i class="fas fa-star"></i> 😎 Genial
+                </button>
+                <button class="emotion-btn" data-emotion="😰 Ansiosa" onclick="selectEmotion('😰 Ansiosa')">
+                    <i class="fas fa-tired"></i> 😰 Ansiosa
+                </button>
+                <button class="emotion-btn" data-emotion="🥱 Cansada" onclick="selectEmotion('🥱 Cansada')">
+                    <i class="fas fa-bed"></i> 🥱 Cansada
+                </button>
+                <button class="emotion-btn" data-emotion="🤔 Reflexiva" onclick="selectEmotion('🤔 Reflexiva')">
+                    <i class="fas fa-brain"></i> 🤔 Reflexiva
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulario para nueva entrada -->
+        <div class="entry-form">
+            <h3 id="formTitle"><i class="fas fa-pen-alt"></i> Escribir nueva entrada</h3>
+            <form id="entryForm">
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="entryTitle" placeholder="¿Qué pasó hoy?" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Contenido</label>
+                    <textarea id="entryContent" placeholder="Escribe aquí tus pensamientos, recuerdos y experiencias del día..." required></textarea>
+                </div>
+                <input type="hidden" id="selectedEmotion" value="">
+                <div class="form-group">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Guardar en mi diario
+                    </button>
+                    <button type="button" class="btn-secondary" id="cancelEdit" style="display: none;" onclick="cancelEdit()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Estadísticas de emociones -->
+        <div class="stats-emotions">
+            <h3><i class="fas fa-chart-bar"></i> Mis emociones este mes</h3>
+            <div class="stats-grid" id="emotionsStats">
+                <!-- Se llena con JS -->
+            </div>
+        </div>
+
+        <!-- Lista de entradas -->
+        <h3 style="color: #857A9E; margin-bottom: 15px;"><i class="fas fa-history"></i> Mis recuerdos</h3>
+        <div class="entries-list" id="entriesList">
+            <!-- Se llena con JS -->
+        </div>
+    </div>
+
+    <script>
+        // CREDENCIALES FIJAS
+        const VALID_USERNAME = "shana";
+        const VALID_PASSWORD = "7236829";
+        
+        // Variables globales
+        let currentUser = null;
+        let currentEntries = [];
+        let editingId = null;
+        let selectedEmotionValue = '😊 Feliz';
+
+        // Inicializar
+        function init() {
+            // Verificar si hay sesión activa
+            const savedSession = localStorage.getItem('diario_session_shana');
+            if (savedSession) {
+                const session = JSON.parse(savedSession);
+                if (session.username === VALID_USERNAME && session.password === VALID_PASSWORD) {
+                    currentUser = VALID_USERNAME;
+                    loadUserData();
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('diaryContent').style.display = 'block';
+                    document.getElementById('currentUser').textContent = 'Shana ✨';
+                    selectedEmotionValue = '😊 Feliz';
+                    document.getElementById('selectedEmotion').value = selectedEmotionValue;
+                    // Marcar emoción seleccionada
+                    document.querySelectorAll('.emotion-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                        if (btn.getAttribute('data-emotion') === '😊 Feliz') {
+                            btn.classList.add('selected');
+                        }
+                    });
+                }
+            }
+        }
+
+        // Login con credenciales fijas
+        function login() {
+            const username = document.getElementById('loginUser').value.trim().toLowerCase();
+            const password = document.getElementById('loginPass').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!username || !password) {
+                errorDiv.textContent = '❌ Por favor, ingresa usuario y contraseña';
+                return;
+            }
+
+            if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                // Login exitoso
+                currentUser = VALID_USERNAME;
+                
+                // Guardar sesión
+                localStorage.setItem('diario_session_shana', JSON.stringify({ 
+                    username: VALID_USERNAME, 
+                    password: VALID_PASSWORD 
+                }));
+                
+                loadUserData();
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('diaryContent').style.display = 'block';
+                document.getElementById('currentUser').textContent = 'Shana ✨';
+                selectedEmotionValue = '😊 Feliz';
+                document.getElementById('selectedEmotion').value = selectedEmotionValue;
+                
+                // Marcar emoción seleccionada
+                document.querySelectorAll('.emotion-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                    if (btn.getAttribute('data-emotion') === '😊 Feliz') {
+                        btn.classList.add('selected');
+                    }
+                });
+                
+                errorDiv.textContent = '';
+                errorDiv.style.color = '#28a745';
+                errorDiv.textContent = '✅ ¡Bienvenida, Shana!';
+                setTimeout(() => {
+                    errorDiv.textContent = '';
+                }, 2000);
+            } else {
+                errorDiv.textContent = '❌ Usuario o contraseña incorrectos';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('diario_session_shana');
+            currentUser = null;
+            currentEntries = [];
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('diaryContent').style.display = 'none';
+            document.getElementById('loginUser').value = 'shana';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginError').textContent = '';
+        }
+
+        function loadUserData() {
+            const data = JSON.parse(localStorage.getItem(`diario_data_${VALID_USERNAME}`) || '{"entries":[]}');
+            currentEntries = data.entries || [];
+            currentEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            renderEntries();
+            updateEmotionStats();
+            loadTheme();
+        }
+
+        function saveUserData() {
+            const data = {
+                entries: currentEntries,
+                settings: { theme: document.body.classList.contains('dark-mode') ? 'dark' : 'light' }
+            };
+            localStorage.setItem(`diario_data_${VALID_USERNAME}`, JSON.stringify(data));
+        }
+
+        function selectEmotion(emotion) {
+            selectedEmotionValue = emotion;
+            document.getElementById('selectedEmotion').value = emotion;
+            
+            // Actualizar UI de botones
+            document.querySelectorAll('.emotion-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.getAttribute('data-emotion') === emotion) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        function saveEntry(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('entryTitle').value.trim();
+            const content = document.getElementById('entryContent').value.trim();
+            const emotion = selectedEmotionValue;
+            
+            if (!title || !content) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campos incompletos',
+                    text: 'Por favor, completa el título y contenido',
+                    background: document.body.classList.contains('dark-mode') ? '#6A8CA9' : '#CBD3D8',
+                    color: document.body.classList.contains('dark-mode') ? 'white' : '#333'
+                });
+                return;
+            }
+            
+            if (editingId) {
+                // Editar entrada existente
+                const index = currentEntries.findIndex(e => e.id === editingId);
+                if (index !== -1) {
+                    currentEntries[index] = {
+                        ...currentEntries[index],
+                        title: title,
+                        content: content,
+                        emotion: emotion,
+                        date: new Date().toISOString(),
+                        edited: true
+                    };
+                }
+                editingId = null;
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Actualizado!',
+                    text: 'Tu entrada ha sido actualizada',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: document.body.classList.contains('dark-mode') ? '#6A8CA9' : '#CBD3D8'
+                });
+            } else {
+                // Nueva entrada
+                const newEntry = {
+                    id: Date.now(),
+                    title: title,
+                    content: content,
+                    emotion: emotion,
+                    date: new Date().toISOString()
+                };
+                currentEntries.unshift(newEntry);
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Guardado!',
+                    text: 'Tu entrada ha sido guardada en tu diario',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: document.body.classList.contains('dark-mode') ? '#6A8CA9' : '#CBD3D8'
+                });
+            }
+            
+            saveUserData();
+            renderEntries();
+            updateEmotionStats();
+            clearForm();
+        }
+
+        function editEntry(id) {
+            const entry = currentEntries.find(e => e.id === id);
+            if (!entry) return;
+            
+            editingId = id;
+            document.getElementById('entryTitle').value = entry.title;
+            document.getElementById('entryContent').value = entry.content;
+            selectEmotion(entry.emotion);
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> Editando entrada';
+            document.getElementById('cancelEdit').style.display = 'inline-flex';
+            
+            // Scroll al formulario
+            document.querySelector('.entry-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteEntry(id) {
+            Swal.fire({
+                title: '¿Eliminar esta entrada?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#A67CA4',
+                cancelButtonColor: '#6A8CA9',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                background: document.body.classList.contains('dark-mode') ? '#6A8CA9' : '#CBD3D8',
+                color: document.body.classList.contains('dark-mode') ? 'white' : '#333'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    currentEntries = currentEntries.filter(e => e.id !== id);
+                    saveUserData();
+                    renderEntries();
+                    updateEmotionStats();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Eliminada',
+                        text: 'La entrada ha sido eliminada',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        background: document.body.classList.contains('dark-mode') ? '#6A8CA9' : '#CBD3D8'
+                    });
+                }
+            });
+        }
+
+        function clearForm() {
+            document.getElementById('entryForm').reset();
+            editingId = null;
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Escribir nueva entrada';
+            document.getElementById('cancelEdit').style.display = 'none';
+            selectEmotion('😊 Feliz');
+        }
+
+        function cancelEdit() {
+            clearForm();
+        }
+
+        function renderEntries() {
+            const container = document.getElementById('entriesList');
+            
+            if (currentEntries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-journal-whills" style="font-size: 4rem; color: #A67CA4;"></i>
+                        <p style="color: #857A9E;">No hay entradas en tu diario</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px; color: #6A8CA9;">¡Escribe tu primer recuerdo!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = currentEntries.map(entry => `
+                <div class="entry-card">
+                    <div class="entry-header">
+                        <div class="entry-date">
+                            <i class="far fa-calendar-alt"></i>
+                            ${formatDate(entry.date)}
+                            ${entry.edited ? '<span style="font-size: 0.7rem; opacity: 0.7;">(editado)</span>' : ''}
+                        </div>
+                        <div class="entry-emotion">
+                            ${entry.emotion}
+                        </div>
+                    </div>
+                    <div class="entry-title">${escapeHtml(entry.title)}</div>
+                    <div class="entry-content">${escapeHtml(entry.content)}</div>
+                    <div class="entry-actions">
+                        <button class="btn-icon btn-edit" onclick="editEntry(${entry.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn-icon btn-delete" onclick="deleteEntry(${entry.id})">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateEmotionStats() {
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            
+            const recentEntries = currentEntries.filter(e => new Date(e.date) >= lastMonth);
+            const emotionCount = {};
+            
+            recentEntries.forEach(entry => {
+                emotionCount[entry.emotion] = (emotionCount[entry.emotion] || 0) + 1;
+            });
+            
+            const emotionsList = ['😊 Feliz', '😢 Triste', '😠 Enojada', '😍 Enamorada', '😎 Genial', '😰 Ansiosa', '🥱 Cansada', '🤔 Reflexiva'];
+            
+            const statsHtml = emotionsList.map(emotion => `
+                <div class="stat-emotion">
+                    <div style="font-size: 2rem;">${emotion.split(' ')[0]}</div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #A67CA4;">${emotionCount[emotion] || 0}</div>
+                    <div style="font-size: 0.8rem; color: #6A8CA9;">${emotion.split(' ')[1] || ''}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('emotionsStats').innerHTML = statsHtml;
+        }
+
+        function formatDate(dateISO) {
+            const date = new Date(dateISO);
+            const hoy = new Date();
+            const ayer = new Date(hoy);
+            ayer.setDate(ayer.getDate() - 1);
+            
+            if (date.toDateString() === hoy.toDateString()) {
+                return `Hoy, ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+            } else if (date.toDateString() === ayer.toDateString()) {
+                return `Ayer, ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+            } else {
+                return date.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            if (currentUser) {
+                const data = JSON.parse(localStorage.getItem(`diario_data_${VALID_USERNAME}`) || '{"entries":[]}');
+                data.settings = { theme: isDark ? 'dark' : 'light' };
+                localStorage.setItem(`diario_data_${VALID_USERNAME}`, JSON.stringify(data));
+            }
+        }
+
+        function loadTheme() {
+            if (currentUser) {
+                const data = JSON.parse(localStorage.getItem(`diario_data_${VALID_USERNAME}`) || '{"entries":[]}');
+                if (data.settings && data.settings.theme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                }
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            document.getElementById('entryForm').addEventListener('submit', saveEntry);
+            
+            // Enter para login
+            document.getElementById('loginPass').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') login();
+            });
+        });
+    </script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MetaMascota · Metas con tareas que alimentan a tu compañero</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Quicksand', 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #fce8f5 0%, #f3e0fa 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .mascot-panel {
+            background: rgba(255, 248, 253, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 3rem;
+            padding: 1.2rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            box-shadow: 0 12px 28px rgba(168, 85, 147, 0.2);
+            border: 1px solid #ffd9f0;
+        }
+
+        .mascot-area {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            background: #ffeef8;
+            padding: 0.5rem 1.8rem 0.5rem 1.2rem;
+            border-radius: 4rem;
+            box-shadow: inset 0 0 0 1px #ffffffcc, 0 8px 18px #d9b0cf40;
+        }
+
+        .mascot-emoji {
+            font-size: 4.8rem;
+            filter: drop-shadow(2px 6px 12px rgba(138, 58, 108, 0.3));
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .mascot-stats {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mascot-name {
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #a13e73;
+            letter-spacing: -0.3px;
+        }
+
+        .growth-bar-container {
+            background-color: #eeddff;
+            border-radius: 40px;
+            width: 180px;
+            height: 12px;
+            margin: 6px 0 4px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px #cba5c0;
+        }
+
+        .growth-fill {
+            background: linear-gradient(90deg, #e87cb9, #c45c9a);
+            width: 0%;
+            height: 100%;
+            border-radius: 40px;
+            transition: width 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .growth-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #7a4670;
+        }
+
+        .global-stats {
+            background: #f5e6fc;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #b35f8e;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .metas-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .meta-card {
+            background: #fff9fe;
+            border-radius: 2rem;
+            box-shadow: 0 10px 24px rgba(160, 100, 140, 0.15);
+            overflow: hidden;
+            border: 1px solid #ffdbef;
+            transition: all 0.2s;
+        }
+
+        .meta-header {
+            background: #faeef9;
+            padding: 1rem 1.8rem;
+            border-bottom: 2px dashed #e9bddc;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.8rem;
+        }
+
+        .meta-titles {
+            flex: 2;
+        }
+
+        .meta-titles h2 {
+            font-size: 1.5rem;
+            color: #882c61;
+            letter-spacing: -0.2px;
+            font-weight: 700;
+        }
+
+        .meta-fechas {
+            font-size: 0.75rem;
+            background: #ffeef4;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            display: inline-block;
+            color: #b35286;
+        }
+
+        .consecuencias {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.7rem;
+            background: #f3e2fc;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .consecuencia-badge {
+            background: white;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            color: #b5467a;
+        }
+
+        .meta-actions {
+            display: flex;
+            gap: 0.7rem;
+            align-items: center;
+        }
+
+        .edit-meta, .delete-meta {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.3rem;
+            border-radius: 50%;
+            transition: 0.1s;
+            width: 34px;
+            height: 34px;
+        }
+
+        .edit-meta:hover { background: #e2c7f0; transform: scale(1.02);}
+        .delete-meta:hover { background: #ffe0e7; color: #c23b6e;}
+
+        .tasks-section {
+            padding: 1rem 1.8rem 1.8rem;
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .task-item {
+            background: #fef7fc;
+            border-radius: 2rem;
+            padding: 0.6rem 1rem 0.6rem 1.2rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            box-shadow: 0 2px 6px #eed7f0;
+            transition: 0.1s;
+            border: 1px solid #f5cee9;
+        }
+
+        .task-check {
+            transform: scale(1.2);
+            accent-color: #bf6f9b;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task-name {
+            flex: 2;
+            font-weight: 500;
+            color: #3b2a36;
+            word-break: break-word;
+        }
+
+        .task-datetime {
+            font-size: 0.7rem;
+            background: #f1e2fa;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            color: #86466b;
+            white-space: nowrap;
+        }
+
+        .task-edit, .task-delete {
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 2rem;
+        }
+        .task-edit:hover { background: #edd9fc; }
+        .task-delete:hover { background: #ffdeec; color: #cc5585;}
+
+        .add-task-form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.7rem;
+            background: #faeef7;
+            padding: 0.8rem 1rem;
+            border-radius: 3rem;
+            margin-top: 1rem;
+        }
+
+        .add-task-form input, .add-task-form input[type="datetime-local"] {
+            border: none;
+            background: white;
+            padding: 0.6rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            outline: none;
+            flex: 1 1 150px;
+            border: 1px solid #f0cae5;
+        }
+
+        .btn-add-task {
+            background: #bf7aa3;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .btn-add-task:hover { background: #aa628b; }
+
+        .btn-agregar-meta {
+            background: #b67399;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 3rem;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            width: fit-content;
+            box-shadow: 0 4px 8px #d9a9c4;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #f3e2f0cc;
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff5fc;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 35px #b277a0;
+        }
+        .modal-content input, .modal-content textarea {
+            width: 100%;
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 2rem;
+            border: 1px solid #e6bdd6;
+        }
+        button.primary {
+            background: #c278a3;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 2rem;
+            margin-top: 1rem;
+        }
+
+        .btn-reset {
+            background: #e2c7f0;
+            color: #882c61;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .task-datetime { white-space: normal; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="mascot-panel">
+        <div class="mascot-area">
+            <div class="mascot-emoji" id="mascotEmoji">🐣</div>
+            <div class="mascot-stats">
+                <span class="mascot-name">Lilipú</span>
+                <div class="growth-bar-container">
+                    <div class="growth-fill" id="growthFill"></div>
+                </div>
+                <span class="growth-text" id="growthText">Nivel crecimiento: 0%</span>
+            </div>
+        </div>
+        <div class="global-stats">
+            <span>🎯 Metas activas: <span id="totalMetasCount">0</span></span>
+            <span>✅ Tareas completadas: <span id="completedTasksTotal">0</span></span>
+            <button class="btn-reset" id="resetDataBtn" title="Restaurar datos de ejemplo">🔄 Restaurar ejemplo</button>
+        </div>
+    </div>
+
+    <div class="metas-grid" id="metasContainer"></div>
+
+    <button class="btn-agregar-meta" id="openMetaModalBtn">+ Nueva meta / objetivo</button>
+</div>
+
+<!-- Modal para crear/editar meta -->
+<div id="metaModal" class="modal">
+    <div class="modal-content">
+        <h3 style="color:#a13e73" id="modalTitle">✨ Nueva meta</h3>
+        <input type="text" id="metaNombre" placeholder="Nombre de la meta (ej: Aprender guitarra)" autocomplete="off">
+        <div style="display: flex; gap: 0.5rem;">
+            <input type="date" id="metaFechaInicio" placeholder="Fecha inicio">
+            <input type="date" id="metaFechaFin" placeholder="Fecha fin">
+        </div>
+        <textarea id="metaConsecuenciaExito" rows="2" placeholder="Consecuencia si se termina con éxito 🌸 (ej: Celebración especial)"></textarea>
+        <textarea id="metaConsecuenciaFracaso" rows="2" placeholder="Consecuencia si no se termina ⚠️ (ej: perder privilegio)"></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1rem;">
+            <button id="closeMetaModal" style="background:#e3ccee;">Cancelar</button>
+            <button id="saveMetaBtn" class="primary">Guardar meta</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar tarea -->
+<div id="taskModal" class="modal">
+    <div class="modal-content">
+        <h3 style="color:#a13e73">✏️ Editar tarea</h3>
+        <input type="text" id="taskEditName" placeholder="Nombre de la tarea">
+        <input type="datetime-local" id="taskEditDateTime">
+        <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1rem;">
+            <button id="closeTaskModal">Cancelar</button>
+            <button id="saveTaskChangesBtn" class="primary">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- CLAVE PARA LOCALSTORAGE ----------
+    const STORAGE_KEY = 'metamascota_data';
+
+    // ---------- DATOS POR DEFECTO ----------
+    function getDefaultMetas() {
+        return [
+            {
+                id: "m1",
+                nombre: "🏆 Leer 2 libros este mes",
+                fechaInicio: "2025-03-01",
+                fechaFin: "2025-03-30",
+                consecuenciaExito: "📚 Librería + peluche nuevo para mascota",
+                consecuenciaFracaso: "😔 sin serie favorita por 1 semana",
+                tareas: [
+                    { id: "t1", nombre: "Leer 20 páginas", fechaHora: "2025-03-10T18:00", completada: false },
+                    { id: "t2", nombre: "Terminar primer libro", fechaHora: "2025-03-18T20:00", completada: false },
+                    { id: "t3", nombre: "Reseña segundo libro", fechaHora: "2025-03-28T12:00", completada: false }
+                ]
+            },
+            {
+                id: "m2",
+                nombre: "🧘‍♀️ Rutina de ejercicio",
+                fechaInicio: "2025-03-05",
+                fechaFin: "2025-04-05",
+                consecuenciaExito: "💪 ropa deportiva nueva + energía",
+                consecuenciaFracaso: "🛋️ menos tiempo libre fin de semana",
+                tareas: [
+                    { id: "t4", nombre: "Cardio 15min", fechaHora: "2025-03-12T08:30", completada: false },
+                    { id: "t5", nombre: "Yoga 20min", fechaHora: "2025-03-15T09:00", completada: false }
+                ]
+            }
+        ];
+    }
+
+    // ---------- CARGA Y GUARDADO ----------
+    let metas = [];
+
+    function loadFromStorage() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                metas = JSON.parse(stored);
+                // Asegurar que cada tarea tenga id único si falta (compatibilidad)
+                metas.forEach(meta => {
+                    if (meta.tareas) {
+                        meta.tareas.forEach(task => {
+                            if (!task.id) task.id = generateId();
+                        });
+                    } else {
+                        meta.tareas = [];
+                    }
+                });
+            } catch(e) { metas = getDefaultMetas(); }
+        } else {
+            metas = getDefaultMetas();
+        }
+    }
+
+    function saveToStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(metas));
+    }
+
+    // Resetear a datos de ejemplo
+    function resetToSample() {
+        metas = getDefaultMetas();
+        saveToStorage();
+        renderMetas();
+    }
+
+    // Helper id
+    function generateId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
+
+    // Recalcular crecimiento mascota en base a tareas completadas globalmente
+    function updateMascotGrowth() {
+        let totalTasks = 0;
+        let completedTasks = 0;
+        metas.forEach(meta => {
+            if (meta.tareas) {
+                meta.tareas.forEach(task => {
+                    totalTasks++;
+                    if (task.completada) completedTasks++;
+                });
+            }
+        });
+        const percent = totalTasks === 0 ? 0 : (completedTasks / totalTasks) * 100;
+        const growthPercent = Math.min(100, percent);
+        document.getElementById('growthFill').style.width = growthPercent + '%';
+        document.getElementById('growthText').innerText = `Nivel crecimiento: ${Math.floor(growthPercent)}%`;
+        document.getElementById('completedTasksTotal').innerText = completedTasks;
+        
+        // Cambiar emoji según crecimiento
+        const mascotEmoji = document.getElementById('mascotEmoji');
+        if (growthPercent >= 80) mascotEmoji.innerText = '🦄✨';
+        else if (growthPercent >= 50) mascotEmoji.innerText = '🐣🌸';
+        else if (growthPercent >= 20) mascotEmoji.innerText = '🐥💖';
+        else mascotEmoji.innerText = '🥚🌱';
+    }
+
+    // Actualizar contador metas
+    function updateMetaCounter() {
+        document.getElementById('totalMetasCount').innerText = metas.length;
+    }
+
+    function escapeHtml(str) { 
+        if(!str) return ''; 
+        return str.replace(/[&<>]/g, function(m){
+            if(m==='&') return '&amp;'; 
+            if(m==='<') return '&lt;'; 
+            if(m==='>') return '&gt;'; 
+            return m;
+        }); 
+    }
+    
+    function getDefaultDateTime() {
+        const now = new Date();
+        now.setHours(now.getHours() + 1);
+        now.setMinutes(0);
+        return now.toISOString().slice(0, 16);
+    }
+
+    // Renderizar todo
+    function renderMetas() {
+        const container = document.getElementById('metasContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        metas.forEach((meta) => {
+            const metaCard = document.createElement('div');
+            metaCard.className = 'meta-card';
+            metaCard.dataset.id = meta.id;
+            
+            const fechaInicioStr = meta.fechaInicio ? new Date(meta.fechaInicio).toLocaleDateString() : 'sin fecha';
+            const fechaFinStr = meta.fechaFin ? new Date(meta.fechaFin).toLocaleDateString() : 'sin fecha';
+            
+            metaCard.innerHTML = `
+                <div class="meta-header">
+                    <div class="meta-titles">
+                        <h2>${escapeHtml(meta.nombre)}</h2>
+                        <div class="meta-fechas">📅 ${fechaInicioStr} — ${fechaFinStr}</div>
+                        <div class="consecuencias">
+                            <span class="consecuencia-badge">🎉 Éxito: ${escapeHtml(meta.consecuenciaExito || '—')}</span>
+                            <span class="consecuencia-badge">⚠️ Fracaso: ${escapeHtml(meta.consecuenciaFracaso || '—')}</span>
+                        </div>
+                    </div>
+                    <div class="meta-actions">
+                        <button class="edit-meta" data-id="${meta.id}" title="Editar meta">✏️</button>
+                        <button class="delete-meta" data-id="${meta.id}" title="Eliminar meta">🗑️</button>
+                    </div>
+                </div>
+                <div class="tasks-section">
+                    <div class="tasks-list" id="tasksList-${meta.id}"></div>
+                    <div class="add-task-form">
+                        <input type="text" id="newTaskName-${meta.id}" placeholder="Nueva tarea..." autocomplete="off">
+                        <input type="datetime-local" id="newTaskDateTime-${meta.id}" value="${getDefaultDateTime()}">
+                        <button class="btn-add-task" data-metaid="${meta.id}">➕ Agregar tarea</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(metaCard);
+            
+            // render tareas
+            const tasksContainer = document.getElementById(`tasksList-${meta.id}`);
+            if (tasksContainer && meta.tareas) {
+                tasksContainer.innerHTML = '';
+                meta.tareas.forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'task-item';
+                    const fechaHoraMostrar = task.fechaHora ? new Date(task.fechaHora).toLocaleString() : 'sin fecha';
+                    taskDiv.innerHTML = `
+                        <input type="checkbox" class="task-check" data-metaid="${meta.id}" data-taskid="${task.id}" ${task.completada ? 'checked' : ''}>
+                        <span class="task-name" style="${task.completada ? 'text-decoration: line-through; opacity:0.7' : ''}">${escapeHtml(task.nombre)}</span>
+                        <span class="task-datetime">🕒 ${escapeHtml(fechaHoraMostrar)}</span>
+                        <button class="task-edit" data-metaid="${meta.id}" data-taskid="${task.id}" title="Editar">✏️</button>
+                        <button class="task-delete" data-metaid="${meta.id}" data-taskid="${task.id}" title="Eliminar">🗑️</button>
+                    `;
+                    tasksContainer.appendChild(taskDiv);
+                });
+            }
+        });
+        
+        attachGlobalEvents();
+        updateMascotGrowth();
+        updateMetaCounter();
+        saveToStorage(); // Guardar después de cada render (por si hubo cambios)
+    }
+    
+    function attachGlobalEvents() {
+        // Checkbox completar tarea
+        document.querySelectorAll('.task-check').forEach(chk => {
+            chk.removeEventListener('change', handleTaskCheck);
+            chk.addEventListener('change', handleTaskCheck);
+        });
+        // Botones agregar tarea
+        document.querySelectorAll('.btn-add-task').forEach(btn => {
+            btn.removeEventListener('click', handleAddTask);
+            btn.addEventListener('click', handleAddTask);
+        });
+        // Editar tarea
+        document.querySelectorAll('.task-edit').forEach(btn => {
+            btn.removeEventListener('click', handleEditTaskBtn);
+            btn.addEventListener('click', handleEditTaskBtn);
+        });
+        // Eliminar tarea
+        document.querySelectorAll('.task-delete').forEach(btn => {
+            btn.removeEventListener('click', handleDeleteTask);
+            btn.addEventListener('click', handleDeleteTask);
+        });
+        // Editar meta
+        document.querySelectorAll('.edit-meta').forEach(btn => {
+            btn.removeEventListener('click', handleEditMeta);
+            btn.addEventListener('click', handleEditMeta);
+        });
+        // Eliminar meta
+        document.querySelectorAll('.delete-meta').forEach(btn => {
+            btn.removeEventListener('click', handleDeleteMeta);
+            btn.addEventListener('click', handleDeleteMeta);
+        });
+    }
+    
+    function handleTaskCheck(e) {
+        const metaId = e.target.dataset.metaid;
+        const taskId = e.target.dataset.taskid;
+        const isChecked = e.target.checked;
+        const meta = metas.find(m => m.id === metaId);
+        if (meta && meta.tareas) {
+            const task = meta.tareas.find(t => t.id === taskId);
+            if (task) {
+                task.completada = isChecked;
+                renderMetas(); // refresca y guarda
+            }
+        }
+    }
+    
+    function handleAddTask(e) {
+        const metaId = e.currentTarget.dataset.metaid;
+        const meta = metas.find(m => m.id === metaId);
+        if (!meta) return;
+        const taskNameInput = document.getElementById(`newTaskName-${metaId}`);
+        const taskDateTimeInput = document.getElementById(`newTaskDateTime-${metaId}`);
+        const nombre = taskNameInput.value.trim();
+        if (!nombre) { alert("Escribe el nombre de la tarea"); return; }
+        const fechaHora = taskDateTimeInput.value;
+        const newTask = {
+            id: generateId(),
+            nombre: nombre,
+            fechaHora: fechaHora,
+            completada: false
+        };
+        if (!meta.tareas) meta.tareas = [];
+        meta.tareas.push(newTask);
+        taskNameInput.value = '';
+        taskDateTimeInput.value = getDefaultDateTime();
+        renderMetas();
+    }
+    
+    let currentEditTask = null; // {metaId, taskId}
+    
+    function handleEditTaskBtn(e) {
+        const metaId = e.currentTarget.dataset.metaid;
+        const taskId = e.currentTarget.dataset.taskid;
+        const meta = metas.find(m => m.id === metaId);
+        if (meta && meta.tareas) {
+            const task = meta.tareas.find(t => t.id === taskId);
+            if (task) {
+                currentEditTask = { metaId, taskId };
+                document.getElementById('taskEditName').value = task.nombre;
+                document.getElementById('taskEditDateTime').value = task.fechaHora || '';
+                document.getElementById('taskModal').style.display = 'flex';
+            }
+        }
+    }
+    
+    function handleDeleteTask(e) {
+        const metaId = e.currentTarget.dataset.metaid;
+        const taskId = e.currentTarget.dataset.taskid;
+        const meta = metas.find(m => m.id === metaId);
+        if (meta && meta.tareas) {
+            meta.tareas = meta.tareas.filter(t => t.id !== taskId);
+            renderMetas();
+        }
+    }
+    
+    // Meta modals
+    const metaModal = document.getElementById('metaModal');
+    const openModalBtn = document.getElementById('openMetaModalBtn');
+    const closeMetaModalBtn = document.getElementById('closeMetaModal');
+    const saveMetaBtn = document.getElementById('saveMetaBtn');
+    let editingMetaId = null;
+    
+    function openMetaModal(metaToEdit = null) {
+        document.getElementById('modalTitle').innerText = metaToEdit ? '✏️ Editar meta' : '✨ Nueva meta';
+        if (metaToEdit) {
+            document.getElementById('metaNombre').value = metaToEdit.nombre;
+            document.getElementById('metaFechaInicio').value = metaToEdit.fechaInicio || '';
+            document.getElementById('metaFechaFin').value = metaToEdit.fechaFin || '';
+            document.getElementById('metaConsecuenciaExito').value = metaToEdit.consecuenciaExito || '';
+            document.getElementById('metaConsecuenciaFracaso').value = metaToEdit.consecuenciaFracaso || '';
+            editingMetaId = metaToEdit.id;
+        } else {
+            document.getElementById('metaNombre').value = '';
+            document.getElementById('metaFechaInicio').value = '';
+            document.getElementById('metaFechaFin').value = '';
+            document.getElementById('metaConsecuenciaExito').value = '';
+            document.getElementById('metaConsecuenciaFracaso').value = '';
+            editingMetaId = null;
+        }
+        metaModal.style.display = 'flex';
+    }
+    
+    function closeMetaModalFunc() { metaModal.style.display = 'none'; }
+    
+    openModalBtn.addEventListener('click', () => openMetaModal(null));
+    closeMetaModalBtn.addEventListener('click', closeMetaModalFunc);
+    
+    saveMetaBtn.addEventListener('click', () => {
+        const nombre = document.getElementById('metaNombre').value.trim();
+        if (!nombre) { alert("El nombre de la meta es obligatorio"); return; }
+        const fechaInicio = document.getElementById('metaFechaInicio').value;
+        const fechaFin = document.getElementById('metaFechaFin').value;
+        const exito = document.getElementById('metaConsecuenciaExito').value;
+        const fracaso = document.getElementById('metaConsecuenciaFracaso').value;
+        
+        if (editingMetaId) {
+            const index = metas.findIndex(m => m.id === editingMetaId);
+            if (index !== -1) {
+                metas[index].nombre = nombre;
+                metas[index].fechaInicio = fechaInicio;
+                metas[index].fechaFin = fechaFin;
+                metas[index].consecuenciaExito = exito;
+                metas[index].consecuenciaFracaso = fracaso;
+                if (!metas[index].tareas) metas[index].tareas = [];
+            }
+        } else {
+            const newMeta = {
+                id: generateId(),
+                nombre: nombre,
+                fechaInicio: fechaInicio,
+                fechaFin: fechaFin,
+                consecuenciaExito: exito,
+                consecuenciaFracaso: fracaso,
+                tareas: []
+            };
+            metas.push(newMeta);
+        }
+        renderMetas();
+        closeMetaModalFunc();
+    });
+    
+    function handleEditMeta(e) {
+        const metaId = e.currentTarget.dataset.id;
+        const meta = metas.find(m => m.id === metaId);
+        if (meta) openMetaModal(meta);
+    }
+    
+    function handleDeleteMeta(e) {
+        const metaId = e.currentTarget.dataset.id;
+        if (confirm("¿Eliminar toda la meta y sus tareas? La mascota puede ponerse triste :(")) {
+            metas = metas.filter(m => m.id !== metaId);
+            renderMetas();
+        }
+    }
+    
+    // task modal handling
+    const taskModalEl = document.getElementById('taskModal');
+    const closeTaskModalBtn = document.getElementById('closeTaskModal');
+    const saveTaskChangesBtn = document.getElementById('saveTaskChangesBtn');
+    
+    closeTaskModalBtn.addEventListener('click', () => taskModalEl.style.display = 'none');
+    saveTaskChangesBtn.addEventListener('click', () => {
+        if (!currentEditTask) return;
+        const { metaId, taskId } = currentEditTask;
+        const meta = metas.find(m => m.id === metaId);
+        if (meta && meta.tareas) {
+            const task = meta.tareas.find(t => t.id === taskId);
+            if (task) {
+                const newName = document.getElementById('taskEditName').value.trim();
+                if (newName) task.nombre = newName;
+                task.fechaHora = document.getElementById('taskEditDateTime').value;
+                renderMetas();
+            }
+        }
+        taskModalEl.style.display = 'none';
+        currentEditTask = null;
+    });
+    
+    // Botón reset
+    document.getElementById('resetDataBtn').addEventListener('click', () => {
+        if (confirm("¿Restaurar datos de ejemplo? Se perderán todas tus metas actuales.")) {
+            resetToSample();
+        }
+    });
+    
+    // Cerrar modales al hacer clic fuera
+    window.addEventListener('click', (e) => { 
+        if (e.target === metaModal) closeMetaModalFunc(); 
+        if (e.target === taskModalEl) taskModalEl.style.display = 'none'; 
+    });
+    
+    // INICIALIZACIÓN
+    loadFromStorage();
+    renderMetas();
+</script>
+</body>
+</html>

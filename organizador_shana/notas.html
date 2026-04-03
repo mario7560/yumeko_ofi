@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloc de Notas - Con Categorías</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #877499 0%, #679F9F 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header h1 i {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 50%;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Formulario de notas */
+        .nota-form-container {
+            background: #E6D4BF;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 2px solid #E18299;
+        }
+
+        .nota-form-container h2 {
+            color: #877499;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #877499;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: #E18299;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E18299;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #877499;
+            box-shadow: 0 0 0 3px rgba(135,116,153,0.1);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E18299;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #877499;
+            box-shadow: 0 0 0 3px rgba(135,116,153,0.1);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #E18299, #877499);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(225,130,153,0.4);
+        }
+
+        .btn-secondary {
+            background: #679F9F;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #528080;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #E18299;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c96e85;
+            transform: translateY(-2px);
+        }
+
+        /* Estadísticas */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #E6D4BF;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            border: 2px solid #E18299;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            color: #877499;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #877499;
+        }
+
+        .stat-card .label {
+            color: #679F9F;
+            margin-top: 5px;
+        }
+
+        /* Filtros */
+        .filtros {
+            background: #E6D4BF;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            border: 2px solid #E18299;
+        }
+
+        .filtro-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filtro-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #877499;
+        }
+
+        .filtro-group input,
+        .filtro-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #E18299;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: white;
+        }
+
+        .filtro-group input:focus,
+        .filtro-group select:focus {
+            outline: none;
+            border-color: #877499;
+        }
+
+        /* Lista de notas */
+        .notas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .nota-card {
+            background: #E6D4BF;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: relative;
+            border-left: 5px solid #E18299;
+            border-right: 2px solid #E18299;
+            border-top: 2px solid #E18299;
+            border-bottom: 2px solid #E18299;
+        }
+
+        .nota-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .nota-fecha {
+            font-size: 0.85rem;
+            color: #679F9F;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nota-categoria {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            width: fit-content;
+        }
+
+        .categoria-familia { background: #E18299; color: white; }
+        .categoria-personal { background: #877499; color: white; }
+        .categoria-estudio { background: #679F9F; color: white; }
+        .categoria-pareja { background: #E18299; color: white; }
+        .categoria-iglesia { background: #877499; color: white; }
+        .categoria-espiritual { background: #679F9F; color: white; }
+        .categoria-trabajo { background: #E18299; color: white; }
+        .categoria-otro { background: #B9ADA3; color: white; }
+
+        .nota-titulo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #877499;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+
+        .nota-contenido {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .nota-acciones {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid #E18299;
+            padding-top: 15px;
+            margin-top: 5px;
+        }
+
+        .btn-icono {
+            padding: 8px 15px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-icono:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-editar {
+            color: #679F9F;
+        }
+
+        .btn-editar:hover {
+            background: #e8f0f0;
+        }
+
+        .btn-eliminar {
+            color: #E18299;
+        }
+
+        .btn-eliminar:hover {
+            background: #ffe8ec;
+        }
+
+        /* Estado vacío */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #E6D4BF;
+            border-radius: 15px;
+            grid-column: 1 / -1;
+            border: 2px solid #E18299;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #E18299;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: #877499;
+            font-size: 1.1rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background: #E6D4BF;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+            border: 2px solid #E18299;
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #877499;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .notas-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .filtros {
+                flex-direction: column;
+            }
+            
+            .filtro-group {
+                width: 100%;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #E6D4BF;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #E18299;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #877499;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-book"></i>
+                Mi Bloc de Notas
+            </h1>
+            <p>Organiza tus ideas, recuerdos y tareas importantes por categorías</p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats">
+            <div class="stat-card">
+                <i class="fas fa-sticky-note"></i>
+                <div class="number" id="totalNotas">0</div>
+                <div class="label">Total de Notas</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar-week"></i>
+                <div class="number" id="notasSemana">0</div>
+                <div class="label">Notas esta semana</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar-month"></i>
+                <div class="number" id="notasMes">0</div>
+                <div class="label">Notas este mes</div>
+            </div>
+        </div>
+
+        <!-- Formulario para crear/editar nota -->
+        <div class="nota-form-container">
+            <h2>
+                <i class="fas fa-pen-alt"></i>
+                <span id="formTitulo">Crear Nueva Nota</span>
+            </h2>
+            <form id="notaForm">
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Categoría</label>
+                    <select id="categoria" required>
+                        <option value="personal">📝 Personal</option>
+                        <option value="familia">👨‍👩‍👧‍👦 Familia</option>
+                        <option value="estudio">📚 Estudio</option>
+                        <option value="pareja">💕 Pareja</option>
+                        <option value="iglesia">⛪ Iglesia</option>
+                        <option value="espiritual">🕯️ Espiritual</option>
+                        <option value="trabajo">💼 Trabajo</option>
+                        <option value="otro">📌 Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Título</label>
+                    <input type="text" id="titulo" placeholder="Ej: Recordatorio importante..." required maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Contenido</label>
+                    <textarea id="contenido" placeholder="Escribe aquí tu nota..." required></textarea>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Nota
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelar">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros">
+            <div class="filtro-group">
+                <label><i class="fas fa-search"></i> Buscar</label>
+                <input type="text" id="buscarInput" placeholder="Buscar por título o contenido...">
+            </div>
+            <div class="filtro-group">
+                <label><i class="fas fa-filter"></i> Categoría</label>
+                <select id="filtroCategoria">
+                    <option value="todas">Todas las categorías</option>
+                    <option value="personal">📝 Personal</option>
+                    <option value="familia">👨‍👩‍👧‍👦 Familia</option>
+                    <option value="estudio">📚 Estudio</option>
+                    <option value="pareja">💕 Pareja</option>
+                    <option value="iglesia">⛪ Iglesia</option>
+                    <option value="espiritual">🕯️ Espiritual</option>
+                    <option value="trabajo">💼 Trabajo</option>
+                    <option value="otro">📌 Otro</option>
+                </select>
+            </div>
+            <div class="filtro-group">
+                <label><i class="fas fa-calendar-alt"></i> Filtrar por fecha</label>
+                <input type="date" id="filtroFecha">
+            </div>
+            <div class="filtro-group">
+                <label><i class="fas fa-sort"></i> Ordenar por</label>
+                <select id="ordenarPor">
+                    <option value="fecha_desc">Más reciente primero</option>
+                    <option value="fecha_asc">Más antiguo primero</option>
+                    <option value="titulo_asc">Título A-Z</option>
+                    <option value="titulo_desc">Título Z-A</option>
+                </select>
+            </div>
+            <div class="filtro-group">
+                <label>&nbsp;</label>
+                <button id="limpiarFiltros" class="btn btn-secondary" style="width: 100%;">
+                    <i class="fas fa-eraser"></i> Limpiar filtros
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista de notas -->
+        <div class="notas-grid" id="notasContainer">
+            <!-- Las notas se cargan aquí dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div id="modalEliminar" class="modal-overlay">
+        <div class="modal">
+            <h3><i class="fas fa-trash-alt"></i> Confirmar eliminación</h3>
+            <p>¿Estás seguro de que quieres eliminar esta nota? Esta acción no se puede deshacer.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="cerrarModalEliminar()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-danger" id="confirmarEliminar">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Array para almacenar las notas
+        let notas = [];
+        let editandoId = null;
+        let notaAEliminar = null;
+
+        // Categorías con sus íconos
+        const categoriasInfo = {
+            personal: { nombre: "Personal", icono: "📝", clase: "categoria-personal" },
+            familia: { nombre: "Familia", icono: "👨‍👩‍👧‍👦", clase: "categoria-familia" },
+            estudio: { nombre: "Estudio", icono: "📚", clase: "categoria-estudio" },
+            pareja: { nombre: "Pareja", icono: "💕", clase: "categoria-pareja" },
+            iglesia: { nombre: "Iglesia", icono: "⛪", clase: "categoria-iglesia" },
+            espiritual: { nombre: "Espiritual", icono: "🕯️", clase: "categoria-espiritual" },
+            trabajo: { nombre: "Trabajo", icono: "💼", clase: "categoria-trabajo" },
+            otro: { nombre: "Otro", icono: "📌", clase: "categoria-otro" }
+        };
+
+        // Cargar notas del localStorage al iniciar
+        function cargarNotas() {
+            const notasGuardadas = localStorage.getItem('bloc_notas_categorias');
+            if (notasGuardadas) {
+                notas = JSON.parse(notasGuardadas);
+            } else {
+                // Notas de ejemplo con categorías
+                notas = [
+                    {
+                        id: Date.now() + 1,
+                        categoria: "personal",
+                        titulo: "¡Bienvenido a tu bloc de notas!",
+                        contenido: "Esta es una nota de ejemplo. Puedes crear, editar y eliminar notas fácilmente. Todas tus notas se guardan automáticamente.",
+                        fecha: new Date().toISOString()
+                    },
+                    {
+                        id: Date.now() + 2,
+                        categoria: "familia",
+                        titulo: "Reunión familiar",
+                        contenido: "Recordatorio: Reunión familiar el próximo domingo a las 3pm en casa de los abuelos.",
+                        fecha: new Date().toISOString()
+                    },
+                    {
+                        id: Date.now() + 3,
+                        categoria: "estudio",
+                        titulo: "Examen importante",
+                        contenido: "Estudiar para el examen de matemáticas. Revisar capítulos 5, 6 y 7.",
+                        fecha: new Date().toISOString()
+                    }
+                ];
+                guardarNotas();
+            }
+            actualizarUI();
+        }
+
+        // Guardar notas en localStorage
+        function guardarNotas() {
+            localStorage.setItem('bloc_notas_categorias', JSON.stringify(notas));
+        }
+
+        // Formatear fecha para mostrar
+        function formatearFecha(fechaISO) {
+            const fecha = new Date(fechaISO);
+            const hoy = new Date();
+            const ayer = new Date(hoy);
+            ayer.setDate(ayer.getDate() - 1);
+            
+            if (fecha.toDateString() === hoy.toDateString()) {
+                return `Hoy, ${fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+            }
+            else if (fecha.toDateString() === ayer.toDateString()) {
+                return `Ayer, ${fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+            }
+            else {
+                return fecha.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        // Obtener notas filtradas y ordenadas
+        function getNotasFiltradas() {
+            const busqueda = document.getElementById('buscarInput').value.toLowerCase();
+            const categoriaFiltro = document.getElementById('filtroCategoria').value;
+            const fechaFiltro = document.getElementById('filtroFecha').value;
+            const orden = document.getElementById('ordenarPor').value;
+            
+            let notasFiltradas = [...notas];
+            
+            // Filtrar por búsqueda
+            if (busqueda) {
+                notasFiltradas = notasFiltradas.filter(nota => 
+                    nota.titulo.toLowerCase().includes(busqueda) || 
+                    nota.contenido.toLowerCase().includes(busqueda)
+                );
+            }
+            
+            // Filtrar por categoría
+            if (categoriaFiltro !== 'todas') {
+                notasFiltradas = notasFiltradas.filter(nota => nota.categoria === categoriaFiltro);
+            }
+            
+            // Filtrar por fecha
+            if (fechaFiltro) {
+                notasFiltradas = notasFiltradas.filter(nota => {
+                    const fechaNota = new Date(nota.fecha).toISOString().split('T')[0];
+                    return fechaNota === fechaFiltro;
+                });
+            }
+            
+            // Ordenar
+            switch(orden) {
+                case 'fecha_asc':
+                    notasFiltradas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+                    break;
+                case 'titulo_asc':
+                    notasFiltradas.sort((a, b) => a.titulo.localeCompare(b.titulo));
+                    break;
+                case 'titulo_desc':
+                    notasFiltradas.sort((a, b) => b.titulo.localeCompare(a.titulo));
+                    break;
+                default:
+                    notasFiltradas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            }
+            
+            return notasFiltradas;
+        }
+
+        // Actualizar estadísticas por categoría
+        function actualizarEstadisticas() {
+            const total = notas.length;
+            const hoy = new Date();
+            const inicioSemana = new Date(hoy);
+            inicioSemana.setDate(hoy.getDate() - hoy.getDay());
+            inicioSemana.setHours(0, 0, 0, 0);
+            
+            const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            
+            const notasSemana = notas.filter(nota => new Date(nota.fecha) >= inicioSemana).length;
+            const notasMes = notas.filter(nota => new Date(nota.fecha) >= inicioMes).length;
+            
+            document.getElementById('totalNotas').textContent = total;
+            document.getElementById('notasSemana').textContent = notasSemana;
+            document.getElementById('notasMes').textContent = notasMes;
+        }
+
+        // Renderizar notas en el DOM
+        function renderizarNotas() {
+            const container = document.getElementById('notasContainer');
+            const notasFiltradas = getNotasFiltradas();
+            
+            if (notasFiltradas.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-notes-medical"></i>
+                        <p>No hay notas para mostrar</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">¡Crea tu primera nota usando el formulario!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = notasFiltradas.map(nota => {
+                const catInfo = categoriasInfo[nota.categoria] || categoriasInfo.otro;
+                return `
+                    <div class="nota-card" data-id="${nota.id}">
+                        <div class="nota-fecha">
+                            <i class="far fa-calendar-alt"></i>
+                            ${formatearFecha(nota.fecha)}
+                        </div>
+                        <div class="nota-categoria ${catInfo.clase}">
+                            <i class="fas fa-tag"></i> ${catInfo.icono} ${catInfo.nombre}
+                        </div>
+                        <div class="nota-titulo">${escapeHtml(nota.titulo)}</div>
+                        <div class="nota-contenido">${escapeHtml(nota.contenido)}</div>
+                        <div class="nota-acciones">
+                            <button class="btn-icono btn-editar" onclick="editarNota(${nota.id})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn-icono btn-eliminar" onclick="confirmarEliminarNota(${nota.id})">
+                                <i class="fas fa-trash-alt"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Escapar HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Actualizar toda la UI
+        function actualizarUI() {
+            renderizarNotas();
+            actualizarEstadisticas();
+        }
+
+        // Guardar o actualizar nota
+        function guardarNota(e) {
+            e.preventDefault();
+            
+            const categoria = document.getElementById('categoria').value;
+            const titulo = document.getElementById('titulo').value.trim();
+            const contenido = document.getElementById('contenido').value.trim();
+            
+            if (!titulo || !contenido) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campos incompletos',
+                    text: 'Por favor, completa todos los campos',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    background: '#E6D4BF'
+                });
+                return;
+            }
+            
+            if (editandoId) {
+                const index = notas.findIndex(n => n.id === editandoId);
+                if (index !== -1) {
+                    notas[index] = {
+                        ...notas[index],
+                        categoria: categoria,
+                        titulo: titulo,
+                        contenido: contenido,
+                        fecha: new Date().toISOString()
+                    };
+                }
+                editandoId = null;
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Actualizada!',
+                    text: 'La nota se ha actualizado correctamente',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: '#E6D4BF'
+                });
+            } else {
+                const nuevaNota = {
+                    id: Date.now(),
+                    categoria: categoria,
+                    titulo: titulo,
+                    contenido: contenido,
+                    fecha: new Date().toISOString()
+                };
+                notas.unshift(nuevaNota);
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Guardada!',
+                    text: 'La nota se ha guardado correctamente',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: '#E6D4BF'
+                });
+            }
+            
+            guardarNotas();
+            limpiarFormulario();
+            actualizarUI();
+        }
+        
+        // Editar nota
+        function editarNota(id) {
+            const nota = notas.find(n => n.id === id);
+            if (!nota) return;
+            
+            editandoId = id;
+            document.getElementById('categoria').value = nota.categoria;
+            document.getElementById('titulo').value = nota.titulo;
+            document.getElementById('contenido').value = nota.contenido;
+            document.getElementById('formTitulo').innerHTML = '<i class="fas fa-edit"></i> Editar Nota';
+            document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-save"></i> Actualizar Nota';
+            
+            document.querySelector('.nota-form-container').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Confirmar eliminación
+        function confirmarEliminarNota(id) {
+            notaAEliminar = id;
+            document.getElementById('modalEliminar').style.display = 'flex';
+        }
+        
+        // Eliminar nota
+        function eliminarNota() {
+            if (notaAEliminar) {
+                notas = notas.filter(n => n.id !== notaAEliminar);
+                guardarNotas();
+                actualizarUI();
+                
+                if (editandoId === notaAEliminar) {
+                    limpiarFormulario();
+                }
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Eliminada!',
+                    text: 'La nota se ha eliminado correctamente',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: '#E6D4BF'
+                });
+            }
+            cerrarModalEliminar();
+        }
+        
+        // Cerrar modal
+        function cerrarModalEliminar() {
+            document.getElementById('modalEliminar').style.display = 'none';
+            notaAEliminar = null;
+        }
+        
+        // Limpiar formulario
+        function limpiarFormulario() {
+            document.getElementById('notaForm').reset();
+            document.getElementById('categoria').value = 'personal';
+            editandoId = null;
+            document.getElementById('formTitulo').innerHTML = '<i class="fas fa-pen-alt"></i> Crear Nueva Nota';
+            document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-save"></i> Guardar Nota';
+        }
+        
+        // Limpiar filtros
+        function limpiarFiltros() {
+            document.getElementById('buscarInput').value = '';
+            document.getElementById('filtroCategoria').value = 'todas';
+            document.getElementById('filtroFecha').value = '';
+            document.getElementById('ordenarPor').value = 'fecha_desc';
+            actualizarUI();
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarNotas();
+            
+            document.getElementById('notaForm').addEventListener('submit', guardarNota);
+            document.getElementById('btnCancelar').addEventListener('click', limpiarFormulario);
+            document.getElementById('limpiarFiltros').addEventListener('click', limpiarFiltros);
+            document.getElementById('confirmarEliminar').addEventListener('click', eliminarNota);
+            
+            document.getElementById('buscarInput').addEventListener('input', actualizarUI);
+            document.getElementById('filtroCategoria').addEventListener('change', actualizarUI);
+            document.getElementById('filtroFecha').addEventListener('change', actualizarUI);
+            document.getElementById('ordenarPor').addEventListener('change', actualizarUI);
+            
+            document.getElementById('modalEliminar').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('modalEliminar')) {
+                    cerrarModalEliminar();
+                }
+            });
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amistad - Mi Organizador</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        /* ===== FONDO ANIMADO DE GATITOS ===== */
+        .cat-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.1;
+            overflow: hidden;
+        }
+
+        .cat {
+            position: absolute;
+            font-size: 3rem;
+            animation: float 20s infinite linear;
+            color: #6c757d;
+        }
+
+        .cat:nth-child(1) { top: 10%; left: 5%; animation-duration: 25s; }
+        .cat:nth-child(2) { top: 30%; right: 10%; animation-duration: 18s; animation-delay: -5s; }
+        .cat:nth-child(3) { bottom: 20%; left: 15%; animation-duration: 22s; animation-delay: -10s; }
+        .cat:nth-child(4) { bottom: 40%; right: 20%; animation-duration: 30s; animation-delay: -15s; }
+        .cat:nth-child(5) { top: 60%; left: 30%; animation-duration: 28s; animation-delay: -7s; }
+        .cat:nth-child(6) { top: 15%; right: 30%; animation-duration: 32s; animation-delay: -12s; }
+        .cat:nth-child(7) { bottom: 10%; left: 40%; animation-duration: 24s; animation-delay: -3s; }
+        .cat:nth-child(8) { bottom: 50%; right: 40%; animation-duration: 26s; animation-delay: -8s; }
+
+        @keyframes float {
+            from {
+                transform: rotate(0deg) translateY(0) rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg) translateY(-200px) rotate(-360deg);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 4px solid #ff9a9e;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: #ff9a9e;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-card .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* ===== SECCIÓN DE CUMPLEAÑOS ===== */
+        .birthday-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 6px solid #ff9a9e;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #ff9a9e;
+        }
+
+        .birthday-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #ff9a9e;
+            box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.1);
+        }
+
+        .color-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        /* Calendario de cumpleaños */
+        .birthday-calendar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .calendar-nav-btn:hover {
+            background: #ff9a9e;
+            color: white;
+        }
+
+        .calendar-month {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: #f8f9fa;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calendar-month i {
+            font-size: 0.9rem;
+            color: #ff9a9e;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            color: #ff9a9e;
+            margin-bottom: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.05);
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .calendar-day.has-birthday {
+            background: #fff0f3;
+            border-color: #ff9a9e;
+        }
+
+        .day-number {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .birthday-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            width: 100%;
+        }
+
+        .birthday-name {
+            font-size: 0.7rem;
+            color: #ff9a9e;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            background: white;
+            padding: 2px 4px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .calendar-day.empty:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Lista de cumpleañeros */
+        .birthday-list {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .birthday-list-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .birthday-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .birthday-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid;
+        }
+
+        .birthday-item .name {
+            font-weight: 600;
+        }
+
+        .birthday-item .date {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .birthday-item .actions {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .birthday-item .action-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .birthday-item .action-btn:hover {
+            background: #ff9a9e;
+            color: white;
+        }
+
+        /* ===== SECCIÓN DIARIO DE AMISTAD ===== */
+        .diary-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 6px solid #fad0c4;
+        }
+
+        .diary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+
+        .diary-header .section-title {
+            margin-bottom: 0;
+        }
+
+        .diary-header .dropdown-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .diary-header .dropdown-icon i {
+            transition: transform 0.3s;
+        }
+
+        .diary-header .dropdown-icon.open i {
+            transform: rotate(180deg);
+        }
+
+        .diary-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .diary-content.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .diary-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        /* ===== FILTROS MEJORADOS ===== */
+        .diary-filters {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #ffe0e0;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            min-width: 80px;
+            font-weight: 600;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label i {
+            color: #ff9a9e;
+        }
+
+        /* Custom Select */
+        .custom-select {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .select-selected {
+            background: white;
+            border: 2px solid #ff9a9e;
+            border-radius: 10px;
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .select-selected:hover {
+            background: #fff0f3;
+        }
+
+        .select-selected i {
+            transition: transform 0.3s;
+            color: #ff9a9e;
+        }
+
+        .select-selected.open i {
+            transform: rotate(180deg);
+        }
+
+        .select-items {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #ff9a9e;
+            border-radius: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .select-items.show {
+            display: block;
+        }
+
+        .select-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 1px solid #ffe0e0;
+        }
+
+        .select-item:last-child {
+            border-bottom: none;
+        }
+
+        .select-item:hover {
+            background: #fff0f3;
+        }
+
+        .select-item.active {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+        }
+
+        /* Photo upload */
+        .photo-upload {
+            border: 3px dashed #ff9a9e;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .photo-upload:hover {
+            background: rgba(255, 154, 158, 0.05);
+        }
+
+        .photo-upload i {
+            font-size: 3rem;
+            color: #ff9a9e;
+            margin-bottom: 10px;
+        }
+
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .photo-preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .photo-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview-item .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f44336;
+            transition: all 0.3s;
+        }
+
+        .photo-preview-item .remove-photo:hover {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Grid de momentos */
+        .momentos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .momento-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border: 1px solid #ffe0e0;
+        }
+
+        .momento-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 154, 158, 0.2);
+        }
+
+        .momento-fotos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            height: 150px;
+            background: #f0f0f0;
+        }
+
+        .momento-foto {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .momento-foto.mas-fotos::after {
+            content: '+';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .momento-content {
+            padding: 20px;
+        }
+
+        .momento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .momento-fecha {
+            font-size: 0.9rem;
+            color: #ff9a9e;
+            font-weight: 600;
+        }
+
+        .momento-amigos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .amigo-tag {
+            background: #f0f0f0;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .momento-reflexion {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .momento-versiculo {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ff9a9e;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .momento-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .momento-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .momento-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .momento-btn.editar:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        .momento-btn.eliminar:hover {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            grid-column: 1 / -1;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #ff9a9e;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 1.2rem;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+            font-size: 1.4rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #f44336;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        /* Notificaciones */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(150%);
+            transition: transform 0.3s;
+            z-index: 1001;
+            border-left: 4px solid #ff9a9e;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+        }
+
+        .notification i {
+            font-size: 1.4rem;
+            color: #ff9a9e;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calendar-days {
+                font-size: 0.8rem;
+            }
+            
+            .birthday-name {
+                font-size: 0.6rem;
+            }
+            
+            .momentos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .custom-select {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo animado de gatitos -->
+    <div class="cat-background">
+        <div class="cat">🐱</div>
+        <div class="cat">😺</div>
+        <div class="cat">😸</div>
+        <div class="cat">😹</div>
+        <div class="cat">😻</div>
+        <div class="cat">😼</div>
+        <div class="cat">😽</div>
+        <div class="cat">🙀</div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-user-friends"></i>
+                Amistad
+            </h1>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAmigos">0</div>
+                    <div class="stat-label">Amigos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="proximosCumples">0</div>
+                    <div class="stat-label">Próximos cumples</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalMomentos">0</div>
+                    <div class="stat-label">Momentos</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE CUMPLEAÑOS -->
+        <div class="birthday-section">
+            <div class="section-title">
+                <i class="fas fa-birthday-cake"></i>
+                Calendario de Cumpleaños
+            </div>
+
+            <!-- Formulario para agregar cumpleaños -->
+            <div class="birthday-form">
+                <h3 style="margin-bottom: 15px; color: #555;">
+                    <i class="fas fa-plus-circle"></i>
+                    Agregar cumpleaños
+                </h3>
+                
+                <form id="birthdayForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Nombre del amigo</label>
+                            <input type="text" id="amigoNombre" class="form-control" placeholder="Ej: María Pérez" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Fecha de cumpleaños</label>
+                            <input type="date" id="amigoFecha" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Color representativo</label>
+                            <div class="color-options" id="colorOptions">
+                                <div class="color-option selected" style="background: #ff9a9e;" data-color="#ff9a9e" onclick="selectColor(this)"></div>
+                                <div class="color-option" style="background: #fad0c4;" data-color="#fad0c4" onclick="selectColor(this)"></div>
+                                <div class="color-option" style="background: #a1c4fd;" data-color="#a1c4fd" onclick="selectColor(this)"></div>
+                                <div class="color-option" style="background: #c2e9fb;" data-color="#c2e9fb" onclick="selectColor(this)"></div>
+                                <div class="color-option" style="background: #d4fc79;" data-color="#d4fc79" onclick="selectColor(this)"></div>
+                                <div class="color-option" style="background: #96e6a1;" data-color="#96e6a1" onclick="selectColor(this)"></div>
+                            </div>
+                            <input type="hidden" id="amigoColor" value="#ff9a9e">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Limpiar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar amigo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Calendario -->
+            <div class="birthday-calendar">
+                <div class="calendar-header">
+                    <div class="calendar-month" id="currentMonthYear" onclick="toggleMonthPicker()">
+                        <span id="monthYearText">Marzo 2026</span>
+                        <i class="fas fa-chevron-down" id="monthPickerArrow"></i>
+                    </div>
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" onclick="cambiarMes(-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="calendar-nav-btn" onclick="cambiarMes(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Selector rápido de meses -->
+                <div class="month-picker" id="monthPicker" style="display: none;">
+                    <!-- Los meses se cargarán aquí -->
+                </div>
+
+                <div class="calendar-weekdays">
+                    <div>Dom</div>
+                    <div>Lun</div>
+                    <div>Mar</div>
+                    <div>Mié</div>
+                    <div>Jue</div>
+                    <div>Vie</div>
+                    <div>Sáb</div>
+                </div>
+
+                <div class="calendar-days" id="calendarDays">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+
+                <!-- Lista de cumpleaños del mes -->
+                <div class="birthday-list">
+                    <div class="birthday-list-title">
+                        <i class="fas fa-gift"></i>
+                        Cumpleaños de este mes:
+                    </div>
+                    <div class="birthday-items" id="birthdayItems">
+                        <!-- Se llenará con JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DIARIO DE AMISTAD -->
+        <div class="diary-section">
+            <div class="diary-header" onclick="toggleDiario()">
+                <div class="section-title">
+                    <i class="fas fa-journal-whills"></i>
+                    Diario de Momentos
+                </div>
+                <div class="dropdown-icon" id="diarioIcon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            
+            <div class="diary-content" id="diarioContent">
+                <!-- Formulario para nuevo momento -->
+                <div class="diary-form">
+                    <h3 style="margin-bottom: 15px; color: #555;">
+                        <i class="fas fa-plus-circle"></i>
+                        Registrar nuevo momento
+                    </h3>
+                    
+                    <form id="momentoForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">¿Con quién compartiste?</label>
+                                <input type="text" id="momentoAmigos" class="form-control" placeholder="Ej: María, Juan, Pedro" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Fecha del momento</label>
+                                <input type="date" id="momentoFecha" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <!-- Subir fotos -->
+                        <div class="form-group">
+                            <label class="form-label">Fotos del momento</label>
+                            <div class="photo-upload" onclick="document.getElementById('fotosInput').click()">
+                                <i class="fas fa-camera"></i>
+                                <p>Haz clic para subir fotos</p>
+                                <p style="font-size: 0.8rem; color: #999;">Máximo 5 fotos</p>
+                            </div>
+                            <input type="file" id="fotosInput" accept="image/*" multiple style="display: none;" onchange="previewFotos(event)">
+                            <div class="photo-preview" id="photoPreview"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Reflexión / Lo que viví</label>
+                            <textarea id="momentoReflexion" class="form-control" rows="4" placeholder="Escribe qué pasó ese día, cómo te sentiste, qué aprendiste..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Versículo bíblico o frase</label>
+                            <textarea id="momentoVersiculo" class="form-control" rows="2" placeholder="Ej: 'En todo tiempo ama el amigo' - Proverbios 17:17"></textarea>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button type="reset" class="btn btn-secondary" onclick="limpiarFotos()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar momento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- FILTROS MEJORADOS: Selectores desplegables -->
+                <div class="diary-filters">
+                    <!-- Filtro por mes -->
+                    <div class="filter-row">
+                        <div class="filter-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            Mes:
+                        </div>
+                        <div class="custom-select" id="monthSelector">
+                            <div class="select-selected" onclick="toggleMonthDropdown()">
+                                <span id="selectedMonthText">Todos</span>
+                                <i class="fas fa-chevron-down" id="monthArrow"></i>
+                            </div>
+                            <div class="select-items" id="monthDropdown">
+                                <!-- Los meses se cargarán aquí -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por persona -->
+                    <div class="filter-row">
+                        <div class="filter-label">
+                            <i class="fas fa-user-friends"></i>
+                            Amigo:
+                        </div>
+                        <div class="custom-select" id="personSelector">
+                            <div class="select-selected" onclick="togglePersonDropdown()">
+                                <span id="selectedPersonText">Todos</span>
+                                <i class="fas fa-chevron-down" id="personArrow"></i>
+                            </div>
+                            <div class="select-items" id="personDropdown">
+                                <!-- Las personas se cargarán aquí -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid de momentos -->
+                <div id="momentosContainer" class="momentos-grid">
+                    <!-- Los momentos se cargarán aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de edición -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Editar momento</h2>
+                <button class="modal-close" onclick="cerrarModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editForm">
+                <!-- Se llenará dinámicamente -->
+            </form>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationMessage">Operación exitosa</span>
+    </div>
+
+    <script>
+        // ===== DATOS =====
+        let amigos = JSON.parse(localStorage.getItem('amigos')) || [];
+        let momentos = JSON.parse(localStorage.getItem('momentos')) || [];
+        
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        // Variables para filtros
+        let mesSeleccionado = 'todos';
+        let personaSeleccionada = 'todos';
+
+        // Fotos temporales
+        let fotosTemp = [];
+
+        const meses = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarAmigosIniciales();
+            cargarMomentosIniciales();
+            actualizarEstadisticas();
+            renderizarCalendario();
+            cargarFiltrosMeses();
+            cargarFiltrosPersonas();
+            renderizarMomentos();
+
+            // Configurar formulario de cumpleaños
+            document.getElementById('birthdayForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                guardarAmigo();
+            });
+
+            // Configurar formulario de momentos
+            document.getElementById('momentoForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                guardarMomento();
+            });
+
+            // Cerrar dropdowns al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#monthSelector')) {
+                    document.getElementById('monthDropdown').classList.remove('show');
+                    document.getElementById('monthArrow').classList.remove('open');
+                }
+                if (!e.target.closest('#personSelector')) {
+                    document.getElementById('personDropdown').classList.remove('show');
+                    document.getElementById('personArrow').classList.remove('open');
+                }
+                if (!e.target.closest('.calendar-month')) {
+                    document.getElementById('monthPicker').style.display = 'none';
+                }
+            });
+        });
+
+        // ===== FUNCIÓN PARA DESPLEGAR/PLEGAR EL DIARIO =====
+        function toggleDiario() {
+            const content = document.getElementById('diarioContent');
+            const icon = document.getElementById('diarioIcon');
+            
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // ===== FUNCIONES PARA COLORES =====
+        function selectColor(element) {
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('amigoColor').value = element.dataset.color;
+        }
+
+        // ===== FUNCIONES PARA CUMPLEAÑOS =====
+        function cargarAmigosIniciales() {
+            if (amigos.length === 0) {
+                amigos = [
+                    {
+                        id: Date.now() - 3,
+                        nombre: 'María Pérez',
+                        fecha: new Date(new Date().getFullYear(), new Date().getMonth(), 15).toISOString().slice(0,10),
+                        color: '#ff9a9e'
+                    },
+                    {
+                        id: Date.now() - 2,
+                        nombre: 'Juan López',
+                        fecha: new Date(new Date().getFullYear(), new Date().getMonth(), 22).toISOString().slice(0,10),
+                        color: '#fad0c4'
+                    },
+                    {
+                        id: Date.now() - 1,
+                        nombre: 'Ana García',
+                        fecha: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 5).toISOString().slice(0,10),
+                        color: '#a1c4fd'
+                    }
+                ];
+                localStorage.setItem('amigos', JSON.stringify(amigos));
+            }
+        }
+
+        function guardarAmigo() {
+            const nuevoAmigo = {
+                id: Date.now(),
+                nombre: document.getElementById('amigoNombre').value.trim(),
+                fecha: document.getElementById('amigoFecha').value,
+                color: document.getElementById('amigoColor').value
+            };
+
+            amigos.push(nuevoAmigo);
+            localStorage.setItem('amigos', JSON.stringify(amigos));
+            
+            document.getElementById('birthdayForm').reset();
+            document.getElementById('amigoColor').value = '#ff9a9e';
+            document.querySelectorAll('.color-option').forEach((opt, index) => {
+                if (index === 0) opt.classList.add('selected');
+                else opt.classList.remove('selected');
+            });
+            
+            actualizarEstadisticas();
+            renderizarCalendario();
+            mostrarNotificacion('¡Cumpleaños agregado!');
+        }
+
+        function eliminarAmigo(id) {
+            if (confirm('¿Eliminar este amigo?')) {
+                amigos = amigos.filter(a => a.id !== id);
+                localStorage.setItem('amigos', JSON.stringify(amigos));
+                actualizarEstadisticas();
+                renderizarCalendario();
+                mostrarNotificacion('Amigo eliminado');
+            }
+        }
+
+        function cambiarMes(direccion) {
+            currentMonth += direccion;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderizarCalendario();
+            document.getElementById('monthYearText').textContent = `${meses[currentMonth]} ${currentYear}`;
+        }
+
+        function toggleMonthPicker() {
+            const picker = document.getElementById('monthPicker');
+            const arrow = document.getElementById('monthPickerArrow');
+            
+            if (picker.style.display === 'none') {
+                // Cargar meses
+                let html = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">';
+                meses.forEach((mes, index) => {
+                    html += `<button class="btn btn-secondary" style="margin: 0;" onclick="irAMes(${index})">${mes}</button>`;
+                });
+                html += '</div>';
+                picker.innerHTML = html;
+                picker.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                picker.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function irAMes(mes) {
+            currentMonth = mes;
+            renderizarCalendario();
+            document.getElementById('monthYearText').textContent = `${meses[currentMonth]} ${currentYear}`;
+            document.getElementById('monthPicker').style.display = 'none';
+            document.getElementById('monthPickerArrow').style.transform = 'rotate(0deg)';
+        }
+
+        function renderizarCalendario() {
+            document.getElementById('monthYearText').textContent = `${meses[currentMonth]} ${currentYear}`;
+            
+            const primerDia = new Date(currentYear, currentMonth, 1);
+            const ultimoDia = new Date(currentYear, currentMonth + 1, 0);
+            const diasEnMes = ultimoDia.getDate();
+            const diaSemanaInicio = primerDia.getDay();
+
+            let html = '';
+            
+            for (let i = 0; i < diaSemanaInicio; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+
+            for (let dia = 1; dia <= diasEnMes; dia++) {
+                const fechaStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                const cumplesDelDia = amigos.filter(a => a.fecha.slice(5) === fechaStr.slice(5));
+                
+                let dayClass = 'calendar-day';
+                if (cumplesDelDia.length > 0) dayClass += ' has-birthday';
+                
+                html += `<div class="${dayClass}">`;
+                html += `<div class="day-number">${dia}</div>`;
+                
+                if (cumplesDelDia.length > 0) {
+                    html += '<div class="birthday-indicator">';
+                    cumplesDelDia.forEach(amigo => {
+                        html += `<div class="birthday-name" style="background: ${amigo.color}20; color: ${amigo.color};">`;
+                        html += `${amigo.nombre}`;
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+            }
+
+            document.getElementById('calendarDays').innerHTML = html;
+
+            const cumplesDelMes = amigos.filter(a => {
+                const mesAmigo = parseInt(a.fecha.slice(5, 7)) - 1;
+                return mesAmigo === currentMonth;
+            }).sort((a, b) => parseInt(a.fecha.slice(8)) - parseInt(b.fecha.slice(8)));
+
+            const birthdayItems = document.getElementById('birthdayItems');
+            
+            if (cumplesDelMes.length === 0) {
+                birthdayItems.innerHTML = '<p style="color: #999; padding: 10px;">No hay cumpleaños este mes</p>';
+            } else {
+                birthdayItems.innerHTML = cumplesDelMes.map(amigo => {
+                    const dia = parseInt(amigo.fecha.slice(8));
+                    return `
+                        <div class="birthday-item" style="border-left-color: ${amigo.color};">
+                            <span class="name">${amigo.nombre}</span>
+                            <span class="date">${dia} de ${meses[currentMonth]}</span>
+                            <div class="actions">
+                                <button class="action-btn" onclick="eliminarAmigo(${amigo.id})" title="Eliminar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // ===== FUNCIONES PARA FILTROS DESPLEGABLES =====
+        function toggleMonthDropdown() {
+            const dropdown = document.getElementById('monthDropdown');
+            const arrow = document.getElementById('monthArrow');
+            
+            document.getElementById('personDropdown').classList.remove('show');
+            document.getElementById('personArrow').classList.remove('open');
+            
+            dropdown.classList.toggle('show');
+            arrow.classList.toggle('open');
+        }
+
+        function togglePersonDropdown() {
+            const dropdown = document.getElementById('personDropdown');
+            const arrow = document.getElementById('personArrow');
+            
+            document.getElementById('monthDropdown').classList.remove('show');
+            document.getElementById('monthArrow').classList.remove('open');
+            
+            dropdown.classList.toggle('show');
+            arrow.classList.toggle('open');
+        }
+
+        function cargarFiltrosMeses() {
+            const container = document.getElementById('monthDropdown');
+            
+            // Opción "Todos"
+            const todosItem = document.createElement('div');
+            todosItem.className = 'select-item active';
+            todosItem.dataset.mes = 'todos';
+            todosItem.textContent = 'Todos';
+            todosItem.onclick = function() { selectMonth('todos', 'Todos'); };
+            container.appendChild(todosItem);
+            
+            // Opciones para cada mes
+            meses.forEach((mes, index) => {
+                const item = document.createElement('div');
+                item.className = 'select-item';
+                item.dataset.mes = index;
+                item.textContent = mes;
+                item.onclick = function() { selectMonth(index, mes); };
+                container.appendChild(item);
+            });
+        }
+
+        function selectMonth(mesIndex, mesNombre) {
+            document.getElementById('selectedMonthText').textContent = mesNombre;
+            mesSeleccionado = mesIndex;
+            
+            // Actualizar clases
+            document.querySelectorAll('#monthDropdown .select-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Cerrar dropdown
+            document.getElementById('monthDropdown').classList.remove('show');
+            document.getElementById('monthArrow').classList.remove('open');
+            
+            renderizarMomentos();
+        }
+
+        function cargarFiltrosPersonas() {
+            const container = document.getElementById('personDropdown');
+            
+            // Opción "Todos"
+            const todosItem = document.createElement('div');
+            todosItem.className = 'select-item active';
+            todosItem.dataset.persona = 'todos';
+            todosItem.textContent = 'Todos';
+            todosItem.onclick = function() { selectPerson('todos', 'Todos'); };
+            container.appendChild(todosItem);
+            
+            // Obtener todas las personas únicas de los momentos
+            const personasSet = new Set();
+            momentos.forEach(momento => {
+                const personas = momento.amigos.split(',').map(p => p.trim());
+                personas.forEach(p => personasSet.add(p));
+            });
+            
+            const personas = Array.from(personasSet).sort();
+            
+            personas.forEach(persona => {
+                const item = document.createElement('div');
+                item.className = 'select-item';
+                item.dataset.persona = persona;
+                item.textContent = persona;
+                item.onclick = function() { selectPerson(persona, persona); };
+                container.appendChild(item);
+            });
+        }
+
+        function selectPerson(persona, personaNombre) {
+            document.getElementById('selectedPersonText').textContent = personaNombre;
+            personaSeleccionada = persona;
+            
+            // Actualizar clases
+            document.querySelectorAll('#personDropdown .select-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Cerrar dropdown
+            document.getElementById('personDropdown').classList.remove('show');
+            document.getElementById('personArrow').classList.remove('open');
+            
+            renderizarMomentos();
+        }
+
+        // ===== FUNCIONES PARA FOTOS =====
+        function previewFotos(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('photoPreview');
+            
+            for (let i = 0; i < files.length; i++) {
+                if (fotosTemp.length >= 5) {
+                    mostrarNotificacion('Máximo 5 fotos permitidas');
+                    break;
+                }
+                
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    fotosTemp.push(e.target.result);
+                    
+                    const photoItem = document.createElement('div');
+                    photoItem.className = 'photo-preview-item';
+                    photoItem.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <button class="remove-photo" onclick="removerFoto(${fotosTemp.length - 1})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    preview.appendChild(photoItem);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removerFoto(index) {
+            fotosTemp.splice(index, 1);
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = '';
+            fotosTemp.forEach((foto, i) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-preview-item';
+                photoItem.innerHTML = `
+                    <img src="${foto}" alt="Preview">
+                    <button class="remove-photo" onclick="removerFoto(${i})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                preview.appendChild(photoItem);
+            });
+        }
+
+        function limpiarFotos() {
+            fotosTemp = [];
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('fotosInput').value = '';
+        }
+
+        // ===== FUNCIONES PARA MOMENTOS =====
+        function cargarMomentosIniciales() {
+            if (momentos.length === 0) {
+                const hoy = new Date();
+                momentos = [
+                    {
+                        id: Date.now() - 5,
+                        amigos: 'María, Juan',
+                        fecha: new Date(hoy.getFullYear(), hoy.getMonth(), 15).toISOString().slice(0,10),
+                        fotos: [],
+                        reflexion: 'Hoy compartimos un café y hablamos de la vida. Fue un momento muy especial de conexión y amistad.',
+                        versiculo: 'El hombre que tiene amigos ha de mostrarse amigo - Proverbios 18:24'
+                    },
+                    {
+                        id: Date.now() - 4,
+                        amigos: 'Ana, Pedro, Luis',
+                        fecha: new Date(hoy.getFullYear(), hoy.getMonth() - 1, 10).toISOString().slice(0,10),
+                        fotos: [],
+                        reflexion: 'Celebramos el cumpleaños de Ana. Comida rica y muchas risas.',
+                        versiculo: 'Alégrate con los que se alegran - Romanos 12:15'
+                    },
+                    {
+                        id: Date.now() - 3,
+                        amigos: 'Carlos',
+                        fecha: new Date(hoy.getFullYear(), hoy.getMonth() - 2, 5).toISOString().slice(0,10),
+                        fotos: [],
+                        reflexion: 'Tuvimos una conversación profunda sobre nuestros sueños y metas.',
+                        versiculo: 'El hierro con hierro se aguza - Proverbios 27:17'
+                    }
+                ];
+                localStorage.setItem('momentos', JSON.stringify(momentos));
+            }
+        }
+
+        function guardarMomento() {
+            const nuevoMomento = {
+                id: Date.now(),
+                amigos: document.getElementById('momentoAmigos').value.trim(),
+                fecha: document.getElementById('momentoFecha').value,
+                fotos: [...fotosTemp],
+                reflexion: document.getElementById('momentoReflexion').value.trim(),
+                versiculo: document.getElementById('momentoVersiculo').value.trim()
+            };
+
+            momentos.unshift(nuevoMomento);
+            localStorage.setItem('momentos', JSON.stringify(momentos));
+            
+            document.getElementById('momentoForm').reset();
+            limpiarFotos();
+            
+            actualizarEstadisticas();
+            
+            // Recargar filtros
+            document.getElementById('personDropdown').innerHTML = '';
+            cargarFiltrosPersonas();
+            renderizarMomentos();
+            
+            mostrarNotificacion('¡Momento guardado!');
+        }
+
+        function eliminarMomento(id) {
+            if (confirm('¿Eliminar este momento?')) {
+                momentos = momentos.filter(m => m.id !== id);
+                localStorage.setItem('momentos', JSON.stringify(momentos));
+                
+                actualizarEstadisticas();
+                
+                // Recargar filtros
+                document.getElementById('personDropdown').innerHTML = '';
+                cargarFiltrosPersonas();
+                renderizarMomentos();
+                
+                mostrarNotificacion('Momento eliminado');
+            }
+        }
+
+        function editarMomento(id) {
+            const momento = momentos.find(m => m.id === id);
+            if (!momento) return;
+
+            const modal = document.getElementById('editModal');
+            const modalBody = document.getElementById('editForm');
+
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">¿Con quién compartiste?</label>
+                    <input type="text" id="editMomentoAmigos" class="form-control" value="${momento.amigos}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Fecha del momento</label>
+                    <input type="date" id="editMomentoFecha" class="form-control" value="${momento.fecha}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Reflexión</label>
+                    <textarea id="editMomentoReflexion" class="form-control" rows="4" required>${momento.reflexion}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Versículo o frase</label>
+                    <textarea id="editMomentoVersiculo" class="form-control" rows="2">${momento.versiculo || ''}</textarea>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar cambios
+                    </button>
+                </div>
+            `;
+
+            modalBody.onsubmit = function(e) {
+                e.preventDefault();
+                
+                const index = momentos.findIndex(m => m.id === id);
+                if (index !== -1) {
+                    momentos[index] = {
+                        ...momentos[index],
+                        amigos: document.getElementById('editMomentoAmigos').value,
+                        fecha: document.getElementById('editMomentoFecha').value,
+                        reflexion: document.getElementById('editMomentoReflexion').value,
+                        versiculo: document.getElementById('editMomentoVersiculo').value
+                    };
+                    
+                    localStorage.setItem('momentos', JSON.stringify(momentos));
+                    cerrarModal();
+                    
+                    // Recargar filtros
+                    document.getElementById('personDropdown').innerHTML = '';
+                    cargarFiltrosPersonas();
+                    renderizarMomentos();
+                    
+                    mostrarNotificacion('Momento actualizado');
+                }
+            };
+
+            modal.classList.add('active');
+        }
+
+        function renderizarMomentos() {
+            const container = document.getElementById('momentosContainer');
+            
+            let momentosFiltrados = [...momentos];
+            
+            // Filtrar por mes
+            if (mesSeleccionado !== 'todos') {
+                momentosFiltrados = momentosFiltrados.filter(momento => {
+                    const mesMomento = new Date(momento.fecha).getMonth();
+                    return mesMomento === parseInt(mesSeleccionado);
+                });
+            }
+            
+            // Filtrar por persona
+            if (personaSeleccionada !== 'todos') {
+                momentosFiltrados = momentosFiltrados.filter(momento => {
+                    const personas = momento.amigos.split(',').map(p => p.trim());
+                    return personas.includes(personaSeleccionada);
+                });
+            }
+            
+            momentosFiltrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+            if (momentosFiltrados.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-journal-whills"></i>
+                        </div>
+                        <div class="empty-text">No hay momentos</div>
+                        <p>${(mesSeleccionado !== 'todos' || personaSeleccionada !== 'todos') ? 'Prueba con otros filtros' : '¡Comienza a registrar tus momentos especiales con amigos!'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = momentosFiltrados.map(momento => {
+                const colores = ['#ff9a9e', '#fad0c4', '#a1c4fd', '#c2e9fb', '#d4fc79', '#96e6a1'];
+                const mesIndex = new Date(momento.fecha).getMonth();
+                const color = colores[mesIndex % colores.length];
+                
+                return `
+                    <div class="momento-card" style="border-top: 4px solid ${color};">
+                        <div class="momento-fotos">
+                            ${momento.fotos && momento.fotos.length > 0 ? 
+                                momento.fotos.slice(0, 3).map(foto => `
+                                    <div class="momento-foto" style="background-image: url('${foto}')"></div>
+                                `).join('') +
+                                (momento.fotos.length > 3 ? '<div class="momento-foto mas-fotos"></div>' : '')
+                            : Array(3).fill(0).map(() => '<div class="momento-foto" style="background: #f0f0f0;"></div>').join('')
+                            }
+                        </div>
+                        
+                        <div class="momento-content">
+                            <div class="momento-header">
+                                <span class="momento-fecha">
+                                    <i class="far fa-calendar"></i> ${formatDate(momento.fecha)}
+                                </span>
+                            </div>
+                            
+                            <div class="momento-amigos">
+                                ${momento.amigos.split(',').map(a => `
+                                    <span class="amigo-tag" style="background: ${color}20; color: ${color};">${a.trim()}</span>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="momento-reflexion">
+                                ${momento.reflexion}
+                            </div>
+                            
+                            ${momento.versiculo ? `
+                                <div class="momento-versiculo" style="border-left-color: ${color};">
+                                    "${momento.versiculo}"
+                                </div>
+                            ` : ''}
+                            
+                            <div class="momento-footer">
+                                <button class="momento-btn editar" onclick="editarMomento(${momento.id})" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="momento-btn eliminar" onclick="eliminarMomento(${momento.id})" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ===== FUNCIONES DE UTILIDAD =====
+        function actualizarEstadisticas() {
+            document.getElementById('totalAmigos').textContent = amigos.length;
+            
+            const hoy = new Date();
+            const proximosCumples = amigos.filter(a => {
+                const fechaCumple = new Date(a.fecha);
+                fechaCumple.setFullYear(hoy.getFullYear());
+                const diffTime = fechaCumple - hoy;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays > 0 && diffDays <= 30;
+            }).length;
+            
+            document.getElementById('proximosCumples').textContent = proximosCumples;
+            document.getElementById('totalMomentos').textContent = momentos.length;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function cerrarModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        function mostrarNotificacion(mensaje) {
+            const notification = document.getElementById('notification');
+            const messageSpan = document.getElementById('notificationMessage');
+            
+            messageSpan.textContent = mensaje;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
